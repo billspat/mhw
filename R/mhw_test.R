@@ -4,36 +4,44 @@
 #' test/exploration reading Dr. Kounta's Matlab output and plotting
 
 library(R.matlab)
+library(sf)
+library(ggplot2)
 
 
+mhw_matlab2sf <- function(mhwFilePath, mhwStatName = "MHW.max.C"){
 
-mhw_matlab2df <- function(mhwFilePath, mhwStatName = "MHW.max.C"){
-
+    # read matlab
    mhwStatsMatlab <- readMat(mhwFilePath)
+   # select the column of stats requested
    s <- mhwStatsMatlab[[mhwStatName]]
 
-   
+   # to make it easy to create lat/lon columns use row/column names
    rownames(s) <- mhwStatsMatlab$lon
    colnames(s) <- mhwStatsMatlab$lat
-   # latLon.df <- data.frame(col = rep(colnames(s), each = nrow(s)), 
-   #            row = rep(rownames(s), ncol(s)), 
-   #            value = as.vector(s))
-   
-   latLon.df <- data.frame(lat = rep(colnames(s), each = nrow(s)), 
-                           lon = rep(rownames(s), ncol(s)), 
+
+   # convert matrix to long form
+   latlon.df <- data.frame(lat = as.double(rep(colnames(s), each = nrow(s))), 
+                           lon = as.double(rep(rownames(s), ncol(s))), 
                            x = as.vector(s))
    
-   names(latLon.df)<- c("lat", "lon", mhwStatName)
+   # assign col names inlcuding name of stat
+   names(latlon.df)<- c("lat", "lon", mhwStatName)
+   print(paste(nrow(latlon.df), "points"))
+   # convert to geospatial object
+   latlon.sf <- st_as_sf(latlon.df, coords = c('lon', 'lat'), crs=4326)
    
-   return(latLon.df)
+   return(latlon.sf)
    
 }
 
-globeMHWStat<- function(mhwFilePath){
-  latlon.df <- mhw_matlab2df(m)
-  
-}
 
+# wip_globMHW <- function(mhwFilePath){
+#   # to be written -
+#   library("threejs")
+#   # earth <- "http://eoimages.gsfc.nasa.gov/images/imagerecords/73000/73909/world.topo.bathy.200412.3x5400x2700.jpg"
+#   # globejs(img=earth, bg="white")
+#   
+# }
 
 quicktest <-function( L1 = '/mnt/research/ibeem/climate_mhw/L1/',
                       test_folder = 'ARISE-10/2040-2069/max_metrics', 
@@ -41,7 +49,7 @@ quicktest <-function( L1 = '/mnt/research/ibeem/climate_mhw/L1/',
                       mhwStatName = "MHW.max.C") {
   
   mhwFilePath <- file.path(L1, test_folder, test_file) 
-  global.df <- mhw_matlab2df(mhwFilePath, mhwStatName)
-  return(global.df)
+  mhw.sf <- mhw_matlab2sf(mhwFilePath, mhwStatName)
+  return(mhw.sf)
   
 }
