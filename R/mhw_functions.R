@@ -4,6 +4,8 @@
 #' test/exploration reading Dr. Kounta's Matlab output and plotting
 
 library(R.matlab)
+# library(rhdf5)
+library(hdf5r)
 library(sf)
 library(ggplot2)
 
@@ -51,5 +53,23 @@ quicktest <-function( L1 = '/mnt/research/ibeem/climate_mhw/L1/',
   mhwFilePath <- file.path(L1, test_folder, test_file) 
   mhw.sf <- mhw_matlab2sf(mhwFilePath, mhwStatName)
   return(mhw.sf)
+  
+}
+
+test_file <- function(metrics_folder = '/mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/',
+                      model =  'ARISE-1.0',
+                      metrics_file = 'MHW_metrics_Model_004.mat'){
+  
+  mhwFilePath<- file.path(metrics_folder, model, metrics_file)
+  return(mhwFilePath)
+}
+
+
+open_mhw_detection<-function(mhw_file){
+  # print info
+  h5f = H5File$new(mhw_file, mode='r')
+  d<- h5f$open("MHW")
+  mhw<- h5f$read(d)
+  return(mhw)
   
 }

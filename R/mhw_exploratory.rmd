@@ -1,0 +1,86 @@
+---
+title: "MHW_notes"
+output: html_document
+date: "2024-07-10"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
+
+```
+
+## Marine Heat Wave Project
+
+for Dr. Lala Kounta
+
+### Data Files/Folders
+
+```{r}
+source('mhw_functions.R')
+
+```
+
+
+**Metrics**
+
+```{r}
+L1 = '/mnt/research/ibeem/climate_mhw/L1/'
+test_folder = 'ARISE-10/2040-2069/max_metrics'
+test_file = 'Model_005_MHW_MAX_int_Year_cat_SSP245.mat'
+
+
+mhwFilePath <- file.path(L1, test_folder, test_file) 
+mhwStatName = "MHW.max.C"
+```
+
+Files in the L1 directory are Matlab v6 (or lower) files, such as `r mhwFilePath`, and can be read with "R.matlab" package easily, for example, `r mhwStatName` : 
+
+
+```{r}
+
+mhw.sf <- mhw_matlab2sf(mhwFilePath, mhwStatName)
+plot(mhw.sf)
+```
+
+### MHW_metrics:
+
+Metrics files are Matlab 7 or higher format, which is HDF5 and the R.matlab program can't open them directly.  There are two HDF5 libraries available and "library(rhdf5)" is the most accessible (it has simple syntax for extracting data )
+
+```{r}
+metrics_folder <- '/mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/'
+print('models:')
+list.files(metrics_folder)
+```
+
+
+```{r open}
+metrics_folder <- '/mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/'
+model <-  'ARISE-1.0'
+metrics_file <- 'MHW_metrics_Model_005.mat'
+mhwFilePath<- file.path(metrics_folder, model, metrics_file)
+d <- H5Fopen(mhwFilePath)
+```
+
+```{r}
+d
+```
+
+
+### extract one of the datasets into an R data frame
+
+is easy as using the `$` operator, but the matrices do not have any named dimension, those are in the 'refs' of the HDF5 file but this package does not read them. 
+
+```{r}
+ts <- d$mhw_ts
+```
+
+
+```{r}
+dim(ts)
+```
+
+
+```{r}
+ts[1,23,1]
+```
