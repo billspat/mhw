@@ -1,3 +1,7 @@
+% mhw_export_text.m
+% MATLAB code to open outputs from MHW matlab processes and save as CSV for database import and use by R
+%
+% Pat Bills, based on work from Dr. Lala Kounta
 cd /mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/
 % load and save coordinate index tables as text fils
 load('coordonnates_SSP.mat')
