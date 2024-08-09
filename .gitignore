@@ -5,3 +5,6 @@
 .Renviron
 renv
 data/**
+*.db
+*.duckdb
+
