@@ -2,31 +2,56 @@ source('R/mhw_db.R')
 require(terra)
 library(ggplot2)
 library(tidyterra)
+require('stringr')
 ## SQL 
 
 decades <- c('2040', '2050','2060')
 
-avg_duration_by_decade <- function() {
-  sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+duration_by_decade_sql <- function(mhw_table='mwh_metrics', use_end_date = FALSE) {
+  
+  if(use_end_date){
+    where_clause <- "WHERE ((mhw_end_date >= decades.decade_start) AND (mhw_end_date < decades.decade_end))"
+  } 
+  else {
+    where_clause <- "WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date < decades.decade_end))"
+  }
+  
+  sql <- "SELECT lat, lon, decade, mhw_dur 
+    FROM {mhw_table}, decades 
+    {where_clause}"
+    
+  # GROUP BY lat, lon, decade"  
+  return(stringr::str_glue(sql))
+  
+}
+
+avg_duration_by_decade_sql <- function(mhw_table='mwh_metrics', use_end_date = FALSE) {
+  
+  if(use_end_date){
+    sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur FROM mhw_metrics , decades 
+  WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
+  GROUP BY lat, lon, decade"
+    
+  } else {
+    sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
   FROM mhw_metrics , decades 
   WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date <= decades.decade_end)) 
   GROUP BY lat, lon, decade"
+  }
   
   return(sql)
 }
 
-avg_duration_by_decade_end <- function() {
+avg_duration_by_decade_sql <- function(mhw_table='mwh_metrics') {
   sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur FROM mhw_metrics , decades 
   WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
   GROUP BY lat, lon, decade"
   return(sql)
 }
 
-avg_duration_by_decade_exclusive <- function() {
-  sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur FROM mhw_metrics , decades 
-  WHERE ((mhw_start_date >= decades.decade_start) AND (mhw_end_date <= decades.decade_end)) 
-  GROUP BY lat, lon, decade"
-  return(sql)
+avg_duration_by_decade_truncated <- function(mhw_table='mwh_metrics') {
+  warning("function not implemented yet")
+  return(NA)
 }
 
 #' rasters of global heatwave duration per decade
@@ -49,7 +74,7 @@ durations_by_decade_raster <- function(mhwdb_conn){
 duration_by_decades <- function(mhwdb_conn){
   duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade())
   filterfn <- function(decade_str)  { 
-    return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) ))
+    return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
   }
   d_list <- lapply(decades, filterfn)
 
@@ -59,7 +84,18 @@ duration_by_decades <- function(mhwdb_conn){
 
 ### visualizations
 
-  duration_histogram<-function(mhwdb_conn, log_scale = FALSE){
+duration_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
+    
+  # get rows of data for all decades in single table
+  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
+
+  # create list object, one item per decade
+  filterfn <- function(decade_str)  { 
+      return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
+    }
+  
+  d_list <- lapply(decades, filterfn)
+    
   d<- duration_by_decades(mhwdb_conn)
   d<- lapply(d, function(x) {dplyr::select(x, avg_dur)})
   d<- dplyr::bind_rows(d, .id = "id")
