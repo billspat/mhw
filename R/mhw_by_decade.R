@@ -96,11 +96,10 @@ duration_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = 
   
   d_list <- lapply(decades, filterfn)
     
-  d<- duration_by_decades(mhwdb_conn)
-  d<- lapply(d, function(x) {dplyr::select(x, avg_dur)})
+  d<- lapply(d_list, function(x) {dplyr::select(x, mhw_dur)})
   d<- dplyr::bind_rows(d, .id = "id")
-  g = ggplot(d, aes(avg_dur)) + geom_histogram(bins=100)+ facet_wrap(~id)
-  if(log_scale) g = g + scale_x_log10() 
+  g = ggplot(d, aes(mhw_dur)) + geom_histogram(bins=100)+ facet_wrap(~id)
+  if(log_scale) g = g + scale_x_log10() + scale_y_log10() 
   g
 }
 
