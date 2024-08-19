@@ -25,10 +25,10 @@ dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwmetrics.duckdb')
 #' @export
 mhw_connect <- function(duckdbfilepath = dbfile, required_table_name = "mhw_metrics" ){
   stopifnot( file.exists(duckdbfilepath))
-  con <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
-  tblList <- duckdb::dbListTables(con)
+  conn <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
+  tblList <- duckdb::dbListTables(conn)
   if (required_table_name %in% tblList) {
-    return(con)
+    return(conn)
   } else {
     warning("database does not have required table in it")
     return(NA)
@@ -38,25 +38,25 @@ mhw_connect <- function(duckdbfilepath = dbfile, required_table_name = "mhw_metr
 #' check if connection works
 #' 
 #' test db connection by attempting to run SQL that should work, specific to this project
-check_mhw_connection<- function(con){
-  if(typeof(con)!= "S4") return(FALSE)
+check_mhw_connection<- function(conn){
+  if(typeof(conn)!= "S4") return(FALSE)
   
   n <- 10
   sql <- paste0("select * from mhw_metrics limit ", n)
-  res <- dbGetQuery(con, sql)
+  res <- dbGetQuery(conn, sql)
   return(nrow(res) == n)
 }
 
 #' get dbplyr table connection
 #' 
-#' @param con  database connection 
+#' @param conn  database connection 
 #' @param table_name character name of table
 #' @returns dbplyr table connection for use in dplyr syntax
 #' @export 
-mhw_table<- function(con, table_name){
-  tblList <- duckdb::dbListTables(con)
+mhw_table<- function(conn, table_name){
+  tblList <- duckdb::dbListTables(conn)
   if (table_name %in% tblList) {
-    return(dbplyr::tbl(con, table_name))
+    return(dbplyr::tbl(conn, table_name))
   } else {
     warning(paste("database does not have table", table_name))
     return(NA)
@@ -68,14 +68,14 @@ mhw_table<- function(con, table_name){
 #' 
 #' useful for testing/exploration without creating large memory objects
 #' 
-#' @param con database connection
+#' @param conn database connection
 #' @param tablename a table that exists in the database
 #' @param n number of rows to return, default 10
 #' 
 #' @returns dataframe as result of query, or a promise of one for some db
-table_head<- function(con, tablename, n = 10){
+table_head<- function(conn, tablename, n = 10){
   sql = paste0("select * from ", tablename, " limit ", n)
-  res <- dbGetQuery(con, sql)
+  res <- dbGetQuery(conn, sql)
   return(res)
 
 }
@@ -83,9 +83,9 @@ table_head<- function(con, tablename, n = 10){
 #' get first few rows from a sql statement
 #' 
 #' useful for testing/exploration without creating large member objects
-sql_head<- function(con, sql, n = 10){
+sql_head<- function(conn, sql, n = 10){
   sql <- paste0(sql, " limit ", n)
-  res <- dbGetQuery(con, sql)
+  res <- dbGetQuery(conn, sql)
   return(res)
   
 }
@@ -95,8 +95,8 @@ sql_head<- function(con, sql, n = 10){
 #' Views are stored sql but act as tables in database.  These are useful when 
 #' creating SQL queries that are based on other sql as inputs
 #' this function is short but helps to remember the syntax 
-make_view<- function(con, sql, viewname){
+make_view<- function(conn, sql, viewname){
   view_sql = paste0("CREATE VIEW ", viewname, " AS ", sql)
-  res = dbExecute(con, view_sql)
+  res = dbExecute(conn, view_sql)
   return(res)
 }
