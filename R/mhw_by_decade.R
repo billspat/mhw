@@ -61,7 +61,7 @@ avg_duration_by_decade_truncated <- function(mhw_table='mwh_metrics') {
 #' a raster with layers by decade 
 durations_by_decade_raster <- function(mhwdb_conn){
 
-  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade())
+  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql())
   filterfn <- function(decade_str)  { 
     return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs='EPSG:4326'))
    }
