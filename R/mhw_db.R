@@ -12,7 +12,7 @@ require(dbplyr)
 #' path to the database that will be used for defaults, loaded from environment
 #' create a file `.Renviron` in main directory to use that, or in your own R project
 #' @export
-dbfile <- Sys.getenv('MHWDBFILE', unset='data/mhwmetrics.duckdb')
+dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwmetrics.duckdb')
 
 
 #' get connection to mhw database
