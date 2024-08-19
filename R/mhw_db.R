@@ -1,17 +1,17 @@
-#' mhw_db.R
-#' database functions/utilities used for Marine HeatWave project 
-#' 
-#' MHW project, collaborators Dr. Lala Kounta, Dr. Phoebe Zarnetske, Pat Bills
-#' 
-#' version 1 Pat Bills July 2024
-library(duckdb)
-library(duckplyr)
+# mhw_db.R
+# database functions/utilities used for Marine HeatWave project 
+# MHW project, collaborators Dr. Lala Kounta, Dr. Phoebe Zarnetske, Pat Bills
+#version 1 Pat Bills July 2024
+
+require(duckdb)
+require(dbplyr)
 
 
 #' path to database
 #' 
 #' path to the database that will be used for defaults, loaded from environment
 #' create a file `.Renviron` in main directory to use that, or in your own R project
+#' @export
 dbfile <- Sys.getenv('MHWDBFILE', unset='data/mhwmetrics.duckdb')
 
 
@@ -19,13 +19,14 @@ dbfile <- Sys.getenv('MHWDBFILE', unset='data/mhwmetrics.duckdb')
 #' 
 #' get connection, but also ensure it has at least one of the required tables
 #' 
-#' @param duckdbfilepath
-#' 
+#' @param duckdbfilepath posix path to .duckdb file
+#' @param required_table_name name of table that must be in db to check for
 #' @returns duckdb DBI database connection object for use in dbGetQuery, etc or NA if not found
+#' @export
 mhw_connect <- function(duckdbfilepath = dbfile, required_table_name = "mhw_metrics" ){
   stopifnot( file.exists(duckdbfilepath))
-  con <- dbConnect(duckdb(), dbdir = duckdbfilepath)
-  tblList <- dbListTables(con)
+  con <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
+  tblList <- duckdb::dbListTables(con)
   if (required_table_name %in% tblList) {
     return(con)
   } else {
@@ -44,6 +45,23 @@ check_mhw_connection<- function(con){
   sql <- paste0("select * from mhw_metrics limit ", n)
   res <- dbGetQuery(con, sql)
   return(nrow(res) == n)
+}
+
+#' get dbplyr table connection
+#' 
+#' @param con  database connection 
+#' @param table_name character name of table
+#' @returns dbplyr table connection for use in dplyr syntax
+#' @export 
+mhw_table<- function(con, table_name){
+  tblList <- duckdb::dbListTables(con)
+  if (table_name %in% tblList) {
+    return(dbplyr::tbl(con, table_name))
+  } else {
+    warning(paste("database does not have table", table_name))
+    return(NA)
+  }
+  
 }
 
 #' get a few first rows of database table

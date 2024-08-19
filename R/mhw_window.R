@@ -1,4 +1,4 @@
-source('R/mhw_db.R')
+# source('R/mhw_db.R') # use devtools::load_all() instead
 require(terra)
 library(ggplot2)
 library(tidyterra)

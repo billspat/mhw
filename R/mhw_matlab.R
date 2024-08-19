@@ -1,16 +1,12 @@
-#'test reading MWH output files: mhw_test.R
-
-#' Marine Heat Wave Project
-#' test/exploration reading Dr. Kounta's Matlab output and plotting
+# mhw_matlab.R
+# Marine Heat Wave Project
+# test/exploration reading Dr. Kounta's Matlab output and plotting
 
 library(R.matlab)
 library(sf)
 library(ggplot2)
 
 # CONSTANTS
-
-METRICSFOLDER = '/mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/'
-TESTFILE <-  file.path(metrics_folder,  'ARISE-1.0', 'MHW_metrics_Model_004.mat')
 mhw_matlab2sf <- function(mhwFilePath, mhwStatName = "MHW.max.C"){
 
     # read matlab
@@ -44,10 +40,17 @@ quicktest <-function( L1 = '/mnt/research/ibeem/climate_mhw/L1/',
                       test_file = 'Model_005_MHW_MAX_int_Year_cat_SSP245.mat', 
                       mhwStatName = "MHW.max.C") {
   
+  
   mhwFilePath <- file.path(L1, test_folder, test_file) 
   mhw.sf <- mhw_matlab2sf(mhwFilePath, mhwStatName)
   return(mhw.sf)
   
 }
 
+
+test_import_metrics <- function() {
+  metrics_folder = '/mnt/research/plz-lab/DATA/ClimateData/MHW_metrics/'
+  TESTFILE <-  file.path(metrics_folder,  'ARISE-1.0', 'MHW_metrics_Model_004.mat')
+  
+}
 

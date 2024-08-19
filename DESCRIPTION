@@ -1,0 +1,26 @@
+Package: mhwci
+Type: Package
+Title: Marine Heat Wave Analyis for Climate Intervention
+Version: 0.1.0
+Authors@R: c(
+    person("Pat", "Bills", email = "billspat@msu.edu", role = c("aut", "cre")),
+    person("Lala", "Kounta", email = "kountala@msu.edu", role = c("aut")),
+    person("Phoebe", "Zarnetske", email = "plz@msu.edu", role = c("aut")))
+Maintainer: Pat Bills <billspt@msu.edu>
+Description: Code for building database of marine heat wave scenarios to study effects
+    of climate intervention to support paper 'Marine Heat Waves during Climate Change & Climate Intervention'
+    in prep
+License: MIT
+Imports:
+    duckdb,
+    dplyr,
+    dbplyr,
+    terra,
+    ggplot2,
+    stringr,
+    glue,
+    magrittr,
+    tidyterra
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2

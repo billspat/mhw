@@ -1,11 +1,13 @@
-source('R/mhw_db.R')
+# source('R/mhw_db.R')  # use devtools::load_all() instead 
 require(terra)
-library(ggplot2)
-library(tidyterra)
-require('stringr')
+require(ggplot2)
+require(tidyterra)
+require(stringr)
+require(magrittr)
 ## SQL 
 
 decades <- c('2040', '2050','2060')
+
 
 duration_by_decade_sql <- function(mhw_table='mwh_metrics', use_end_date = FALSE) {
   
@@ -82,9 +84,8 @@ duration_by_decades <- function(mhwdb_conn){
 }
 
 
-### visualizations
 
-duration_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
+duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
     
   # get rows of data for all decades in single table
   duration_by_loc<- dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
