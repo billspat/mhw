@@ -4,7 +4,7 @@
 \alias{make_view}
 \title{given a sql statement create a view in db}
 \usage{
-make_view(con, sql, viewname)
+make_view(conn, sql, viewname)
 }
 \description{
 Views are stored sql but act as tables in database.  These are useful when 

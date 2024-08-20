@@ -4,10 +4,10 @@
 \alias{table_head}
 \title{get a few first rows of database table}
 \usage{
-table_head(con, tablename, n = 10)
+table_head(conn, tablename, n = 10)
 }
 \arguments{
-\item{con}{database connection}
+\item{conn}{database connection}
 
 \item{tablename}{a table that exists in the database}
 

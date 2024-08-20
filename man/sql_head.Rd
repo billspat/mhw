@@ -4,7 +4,7 @@
 \alias{sql_head}
 \title{get first few rows from a sql statement}
 \usage{
-sql_head(con, sql, n = 10)
+sql_head(conn, sql, n = 10)
 }
 \description{
 useful for testing/exploration without creating large member objects

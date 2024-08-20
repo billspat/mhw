@@ -4,10 +4,10 @@
 \alias{mhw_table}
 \title{get dbplyr table connection}
 \usage{
-mhw_table(con, table_name)
+mhw_table(conn, table_name)
 }
 \arguments{
-\item{con}{database connection}
+\item{conn}{database connection}
 
 \item{table_name}{character name of table}
 }
