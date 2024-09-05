@@ -124,6 +124,10 @@ alter table arise15_metrics add column mhw_end_date DATE;
 update arise15_metrics set mhw_onset_date = cast(strptime(cast(mhw_onset as varchar), '%Y%m%d') as date) , 
                       mhw_end_date = cast(strptime(cast(mhw_end as varchar), '%Y%m%d') as date);
 
+
+alter table arise15_metrics add column lat DOUBLE;
+alter table arise15_metrics add column lon DOUBLE;
+
 update arise15_metrics set lat = lat_index.lat from lat_index where arise15_metrics.yloc = lat_index.yloc ;
 update arise15_metrics set lon = lon_index.lon from lon_index where arise15_metrics.xloc = lon_index.xloc ;
 
