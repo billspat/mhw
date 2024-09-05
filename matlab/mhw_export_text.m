@@ -14,13 +14,16 @@ writematrix(wA, 'wA.txt')
 % opened easily in R 
 
 dirfiles = dir('**/*.mat');
-for idx = 1:numel(dirfiles)
+% adjust this for computer you are using 
+cores = 10
+pool = parpool(cores)
+parfor idx = 1:numel(dirfiles)
   dirfile = dirfiles(idx)
-  f = strcat(dirfile.folder, dirfile.name)
-  load(f,'MHW');
+  f = strcat(dirfile.folder, '/', dirfile.name)
+  mhwdata = load(f,'MHW');
   mhwfile = strcat(f, '.mhw.csv'); 
   disp(mhwfile)
-  writetable(MHW, mhwfile);
+  writetable(mhwdata.MHW, mhwfile);
 end
 
 % load and save climatology files used for thresholding
