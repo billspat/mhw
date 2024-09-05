@@ -120,7 +120,7 @@ plot_decade_rasters <- function(mhwdb_conn){
       subtitle = "by lat/lon point") +
     facet_wrap(~lyr,ncol= 1) +
     scale_fill_whitebox_c(
-      palette = "muted",
+      palette = "wiki-scharzwald-cont",
       na.value = "white"
     )
 }
