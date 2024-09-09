@@ -31,7 +31,7 @@ get_dbfile <- function() {
 #' @param required_table_name name of table that must be in db to check for
 #' @returns duckdb DBI database connection object for use in dbGetQuery, etc or NA if not found
 #' @export
-mhw_connect <- function(duckdbfilepath, required_table_name = "mhw_metrics" ){
+mhw_connect <- function(duckdbfilepath, required_table_name = "ensembles" ){
   stopifnot( file.exists(duckdbfilepath))
   conn <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
   tblList <- duckdb::dbListTables(conn)
@@ -46,11 +46,11 @@ mhw_connect <- function(duckdbfilepath, required_table_name = "mhw_metrics" ){
 #' check if connection works
 #' 
 #' test db connection by attempting to run SQL that should work, specific to this project
-check_mhw_connection<- function(conn){
+check_mhw_connection<- function(conn, known_table_name = 'ensembles'){
   if(typeof(conn)!= "S4") return(FALSE)
   
   n <- 10
-  sql <- paste0("select * from mhw_metrics limit ", n)
+  sql <- paste("select * from ", known_table_name, " limit ", n)
   res <- dbGetQuery(conn, sql)
   return(nrow(res) == n)
 }
