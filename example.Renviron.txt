@@ -1,1 +1,2 @@
-MHWDBFILE=data/mhwmetrics.duckdb
+# path to the database file - should be full path so can be used in notebooks and tests
+MHWDBFILE="/mnt/gs21/scratch/plz-lab/mhwci/db/mhwci.db"
