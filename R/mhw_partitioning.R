@@ -4,6 +4,11 @@ decades <- c('2040', '2050','2060')
 
 
 #' create table of start/end dates for year gaps
+#' 
+#' @param partition_size_years integer width of partitions in whole years, not more than 10 usually
+#' @param start_year integer year to start partitioning (low end of range), default 2040
+#' @param end_year integer year to end portioning
+#' @returns vector of integers, division of the range of inter 
 #' @export
 create_partion_table<-function(partition_size_years=3, start_year = 2040, end_year = 2069) {
   start_years<- seq(from = start_year, to = end_year, by = partition_size_years)
