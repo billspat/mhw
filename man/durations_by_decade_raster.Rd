@@ -4,7 +4,11 @@
 \alias{durations_by_decade_raster}
 \title{rasters of global heatwave duration per decade}
 \usage{
-durations_by_decade_raster(mhwdb_conn, mhw_table)
+durations_by_decade_raster(
+  mhwdb_conn,
+  mhw_table,
+  decades = c("2040", "2050", "2060")
+)
 }
 \arguments{
 \item{mhwdb_conn}{database connection}
