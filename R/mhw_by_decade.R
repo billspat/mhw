@@ -9,6 +9,7 @@ require(magrittr)
 decades <- c('2040', '2050','2060')
 
 
+#' @export
 duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
   if(use_end_date){
@@ -27,27 +28,33 @@ duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
 }
 
+#' @export 
 avg_duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
   if(use_end_date){
-    sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur FROM mhw_metrics , decades 
-  WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
-  GROUP BY lat, lon, decade"
+    sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+      FROM {mhw_table} , decades 
+      WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
+      GROUP BY lat, lon, decade"
     
   } else {
-    sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
-  FROM mhw_metrics , decades 
-  WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date <= decades.decade_end)) 
-  GROUP BY lat, lon, decade"
+    sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+      FROM {mhw_table}, decades 
+    WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date <= decades.decade_end)) 
+    GROUP BY lat, lon, decade"
   }
   
+  sql <- glue::glue(sql_template)
   return(sql)
 }
 
 avg_duration_by_decade_sql <- function(mhw_table) {
-  sql <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur FROM mhw_metrics , decades 
+  sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+  FROM {mhw_table} , decades 
   WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
   GROUP BY lat, lon, decade"
+  
+  sql <- glue::glue(sql_template)
   return(sql)
 }
 
@@ -63,7 +70,7 @@ avg_duration_by_decade_truncated <- function(mhw_table) {
 #' @param mhw_table character string name of the table to query, required (e.g. arise10_metrics)
 #' @returns terra raster stack of layers for each decade
 #' @export
-durations_by_decade_raster <- function(mhwdb_conn,mhw_table){
+durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060')){
 
   duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
@@ -112,12 +119,12 @@ duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", lo
 }
 
 
-plot_decade_rasters <- function(mhwdb_conn){
+plot_decade_rasters <- function(mhwdb_conn, mhw_table){
   if (! check_mhw_connection(mhwdb_conn)) { 
     warning("db connection invalid")
   }
   
-  duration_rasters <- durations_by_decade_raster(mhwdb_conn)
+  duration_rasters <- durations_by_decade_raster(mhwdb_conn, mhw_table)
   
   ggplot() +
     geom_spatraster(data = duration_rasters) +
@@ -127,7 +134,7 @@ plot_decade_rasters <- function(mhwdb_conn){
       subtitle = "by lat/lon point") +
     facet_wrap(~lyr,ncol= 1) +
     scale_fill_whitebox_c(
-      palette = "wiki-scharzwald-cont",
+      palette = "muted",
       na.value = "white"
     )
 }
