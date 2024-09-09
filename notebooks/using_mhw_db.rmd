@@ -1,0 +1,85 @@
+---
+title: "MHW CI Exploratory Anlaysis"
+output: html_notebook
+date: "2024-09-03"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(cache = FALSE)
+```
+
+## Marine Heat Wave Climate Intervention Modelling Project
+
+Dr. Lala Kounta, Dr. Phoebe Zarnetske
+
+### Database connection
+
+First set the database file to use.  If there is on in the `.Renviron` file, this will retrieve that and check that it exists. 
+
+```{r}
+dbfile <- mhwci::get_dbfile()
+print(dbfile)
+```
+
+If that is not set, set the db_file variable here and uncomment this line, but it may be easier to create the .Renviron file instead for your setup. 
+
+```{r}
+db_file <- "/mnt/gs21/scratch/plz-lab/mhwci/db/mhwci.db"
+print(file.exists(db_file))
+```
+
+Now that the dbfile is set, create a connection that will be used for the remaining functions.  the variable name `conn` is convention but can be named anything.   
+
+```{r echo=TRUE}
+
+conn<- mhwci::mhw_connect(db_file)
+print(conn)
+```
+
+### Database Contents
+List of tables in current database:
+
+```{r}
+print(duckdb::dbListTables(conn))
+```
+*Sample of data in table arise10_metrics:*
+
+Detection modelling metrics calculated for 10 ensembles under the Arise-1.0 scenario:
+
+```{r echo=TRUE}
+table_head(conn = conn, tablename = "arise10_metrics", n = 10)
+```
+
+```{r}
+decades <- table_head(conn, 'decades')
+print(decades)
+```
+### Decadal Analysis
+
+```{r}
+# these functions are not exported as part of the page and so using the old-school source'ing to get them into the environment
+source('../R/mhw_by_decade.R')
+```
+
+
+Using table: 
+
+```{r}
+mhw_table <-"arise15_metrics"
+print(mhw_table)
+```
+
+
+*Histogram of durations by decade*
+
+```{r echo=TRUE}
+duration_by_decade_histogram(conn, mhw_table, log_scale = TRUE)
+```
+
+**Global heatwave duration by decade**
+
+```{r echo=TRUE}
+plot_decade_rasters(conn, mhw_table)
+```
+
