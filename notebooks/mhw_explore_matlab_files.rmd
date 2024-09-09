@@ -1,5 +1,5 @@
 ---
-title: "MHW_notes"
+title: "MHW_matlab_notes"
 output: html_document
 date: "2024-07-10"
 ---
@@ -10,7 +10,7 @@ knitr::opts_chunk$set(cache = FALSE)
 
 ```
 
-## Marine Heat Wave Project
+## Marine Heat Wave Project: explore Matlab files
 
 for Dr. Lala Kounta
 
