@@ -4,7 +4,7 @@
 \alias{check_mhw_connection}
 \title{check if connection works}
 \usage{
-check_mhw_connection(conn)
+check_mhw_connection(conn, known_table_name = "ensembles")
 }
 \description{
 test db connection by attempting to run SQL that should work, specific to this project

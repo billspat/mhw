@@ -4,7 +4,7 @@
 \alias{mhw_connect}
 \title{get connection to mhw database}
 \usage{
-mhw_connect(duckdbfilepath, required_table_name = "mhw_metrics")
+mhw_connect(duckdbfilepath, required_table_name = "ensembles")
 }
 \arguments{
 \item{duckdbfilepath}{posix path to .duckdb file}

@@ -4,7 +4,15 @@
 \alias{durations_by_decade_raster}
 \title{rasters of global heatwave duration per decade}
 \usage{
-durations_by_decade_raster(mhwdb_conn)
+durations_by_decade_raster(mhwdb_conn, mhw_table)
+}
+\arguments{
+\item{mhwdb_conn}{database connection}
+
+\item{mhw_table}{character string name of the table to query, required (e.g. arise10_metrics)}
+}
+\value{
+terra raster stack of layers for each decade
 }
 \description{
 a raster with layers by decade

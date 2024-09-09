@@ -10,6 +10,16 @@ create_partion_table(
   end_year = 2069
 )
 }
+\arguments{
+\item{partition_size_years}{integer width of partitions in whole years, not more than 10 usually}
+
+\item{start_year}{integer year to start partitioning (low end of range), default 2040}
+
+\item{end_year}{integer year to end portioning}
+}
+\value{
+vector of integers, division of the range of inter
+}
 \description{
 create table of start/end dates for year gaps
 }

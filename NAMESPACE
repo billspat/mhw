@@ -2,6 +2,8 @@
 
 export(create_partion_table)
 export(decades)
+export(duration_by_decades)
+export(durations_by_decade_raster)
 export(get_dbfile)
 export(mhw_connect)
 export(mhw_table)
