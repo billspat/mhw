@@ -12,8 +12,16 @@ require(dbplyr)
 #' path to the database that will be used for defaults, loaded from environment
 #' create a file `.Renviron` in main directory to use that, or in your own R project
 #' @export
-dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwmetrics.duckdb')
-
+get_dbfile <- function() {
+  dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwci.db')
+  if(!file.exists(dbfile)){
+    warning("could not automatically set the default 'dbfile' variable to a file that exists, please set it manually")
+    rm(dbfile)
+  } else {
+    warning(paste("default dbfile set to ", dbfile, " but can be overridden"))
+  }
+  return(dbfile)
+}
 
 #' get connection to mhw database
 #' 
@@ -23,7 +31,7 @@ dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwmetrics.duckdb')
 #' @param required_table_name name of table that must be in db to check for
 #' @returns duckdb DBI database connection object for use in dbGetQuery, etc or NA if not found
 #' @export
-mhw_connect <- function(duckdbfilepath = dbfile, required_table_name = "mhw_metrics" ){
+mhw_connect <- function(duckdbfilepath, required_table_name = "mhw_metrics" ){
   stopifnot( file.exists(duckdbfilepath))
   conn <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
   tblList <- duckdb::dbListTables(conn)
