@@ -4,10 +4,12 @@
 \alias{plot_rasters_squish_outliers}
 \title{plot terra rasters, but manage outliers}
 \usage{
-plot_rasters_squish_outliers(raster_list, cut_percent = 0)
+plot_rasters_squish_outliers(raster_list, title = "", cut_percent = 0)
 }
 \arguments{
 \item{raster_list}{terra spat raster list (or stack?)}
+
+\item{title}{character title of the plot, default is empty title}
 
 \item{cut_percent}{numeric percentile cut-off, see percentile_cutoff_value function for descriptoin, but 1 
 will cut top 1 percent, 0.25 will cut to 0.25% off and display as top color (e.g. red)}
