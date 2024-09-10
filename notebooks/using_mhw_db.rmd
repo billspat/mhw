@@ -7,6 +7,8 @@ date: "2024-09-03"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = FALSE)
+require(mhwci)
+
 ```
 
 ## Marine Heat Wave Climate Intervention Modelling Project
@@ -18,15 +20,16 @@ Dr. Lala Kounta, Dr. Phoebe Zarnetske
 First set the database file to use.  If there is on in the `.Renviron` file, this will retrieve that and check that it exists. 
 
 ```{r}
-dbfile <- mhwci::get_dbfile()
-print(dbfile)
+db_file <- mhwci::get_dbfile()
+print(db_file)
+print(file.exists(db_file))
 ```
 
 If that is not set, set the db_file variable here and uncomment this line, but it may be easier to create the .Renviron file instead for your setup. 
 
 ```{r}
-db_file <- "/mnt/gs21/scratch/plz-lab/mhwci/db/mhwci.db"
-print(file.exists(db_file))
+# db_file <- "/mnt/gs21/scratch/plz-lab/mhwci/db/mhwci.db"
+# print(file.exists(db_file))
 ```
 
 Now that the dbfile is set, create a connection that will be used for the remaining functions.  the variable name `conn` is convention but can be named anything.   
@@ -57,17 +60,10 @@ print(decades)
 ```
 ### Decadal Analysis
 
-```{r}
-# these functions are not exported as part of the page and so using the old-school source'ing to get them into the environment
-source('../R/mhw_by_decade.R')
-```
+There is a table of metrics (duration, dates, lat/long, intensity, etc) for each  scenario that contains all scenarios.  This sets the table to use. 
 
-
-Using table: 
-
-```{r}
+```{r echo=TRUE}
 mhw_table <-"arise15_metrics"
-print(mhw_table)
 ```
 
 
@@ -79,7 +75,27 @@ duration_by_decade_histogram(conn, mhw_table, log_scale = TRUE)
 
 **Global heatwave duration by decade**
 
+Note: 
+we can improve on the title by selecting a single row from this table 
+and getting the value in the 'scenario' column
+
 ```{r echo=TRUE}
-plot_decade_rasters(conn, mhw_table)
+duration_rasters <- durations_by_decade_raster(conn, mhw_table)
+cut_percent = 0.5
+duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table)
+
+plot_rasters_squish_outliers(raster_list = duration_rasters, title = duration_title, cut_percent = 0.5 )
+
 ```
+
+
+### close database connection 
+
+run this when finished so that other other connections to thie file (say from other parts of your code) can be made. 
+
+```{r echo=TRUE}
+print(duckdb::dbDisconnect(conn))
+
+```
+
 
