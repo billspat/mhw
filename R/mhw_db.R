@@ -52,7 +52,7 @@ check_mhw_connection<- function(conn, known_table_name = 'ensembles'){
   
   n <- 10
   sql <- paste("select * from ", known_table_name, " limit ", n)
-  res <- dbGetQuery(conn, sql)
+  res <- duckdb::dbGetQuery(conn, sql)
   return(nrow(res) == n)
 }
 

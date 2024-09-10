@@ -110,19 +110,19 @@ duration_by_decades <- function(mhwdb_conn,mhw_table){
 duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
     
   # get rows of data for all decades in single table
-  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
+  duration_by_loc<- duckdb::dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
 
   # create list object, one item per decade
   filterfn <- function(decade_str)  { 
-      return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
+      return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
     }
   
   d_list <- lapply(decades, filterfn)
     
   d<- lapply(d_list, function(x) {dplyr::select(x, mhw_dur)})
   d<- dplyr::bind_rows(d, .id = "id")
-  g = ggplot(d, aes(mhw_dur)) + geom_histogram(bins=100)+ facet_wrap(~id)
-  if(log_scale) g = g + scale_x_log10() + scale_y_log10() 
+  g = ggplot2::ggplot(d, ggplot2::aes(mhw_dur)) + ggplot2::geom_histogram(bins=100)+ ggplot2::facet_wrap(~id)
+  if(log_scale) g = g + ggplot2::scale_x_log10() + ggplot2::scale_y_log10() 
   g
 }
 
