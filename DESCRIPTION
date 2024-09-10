@@ -21,7 +21,8 @@ Imports:
     magrittr,
     tidyterra (>= 0.6.1),
     duckdb (>= 1.0.0.2),
-    sf
+    sf,
+    R.matlab
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2
