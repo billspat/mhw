@@ -9,6 +9,13 @@ require(magrittr)
 decades <- c('2040', '2050','2060')
 
 
+#' sql for parititioning wave durations by decade 
+#' 
+#' collect all durations (not summarized) by decade, useful for histograms. Decade start/end dates come
+#' from a table 'decades' that must exist in the database
+#' @param mhw_table character name of scenario table to use
+#' @param use_end_date boolean TRUE: use waves ending in the decade; FALSE: use waves starting in the deacde
+#' @returns character sql code to run
 #' @export
 duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
@@ -28,7 +35,15 @@ duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
 }
 
-#' @export 
+#' sql to summary scenario table
+#' 
+#' sql code to calc avg duration grouped by decade. Decade start/end dates come
+#' from a table 'decades' that must exist in the database
+#' 
+#' @param mhw_table character name of scenario table to use
+#' @param use_end_date boolean TRUE: use waves ending in the decade; FALSE: use waves starting in the deacde
+#' @returns character sql code to run
+#' @export
 avg_duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
   if(use_end_date){
@@ -43,16 +58,6 @@ avg_duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
     WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date <= decades.decade_end)) 
     GROUP BY lat, lon, decade"
   }
-  
-  sql <- glue::glue(sql_template)
-  return(sql)
-}
-
-avg_duration_by_decade_sql <- function(mhw_table) {
-  sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
-  FROM {mhw_table} , decades 
-  WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
-  GROUP BY lat, lon, decade"
   
   sql <- glue::glue(sql_template)
   return(sql)
@@ -86,9 +91,12 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
 
 #' calc mean duration by decade
 #' 
+#' @param mhwdb_conn database connection to a mhw database
+#' @param mhw_table character name of the table of ensembles to query
+#' @returns list of dataframes, one dataframe per decade, each data frame see avg_duration_by_decade_sql for
 #' @export 
 duration_by_decades <- function(mhwdb_conn,mhw_table){
-  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade(mhw_table))
+  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
     return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
   }
@@ -98,7 +106,7 @@ duration_by_decades <- function(mhwdb_conn,mhw_table){
 }
 
 
-
+#' @export 
 duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
     
   # get rows of data for all decades in single table
@@ -118,7 +126,7 @@ duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", lo
   g
 }
 
-
+#' @export 
 plot_decade_rasters <- function(mhwdb_conn, mhw_table){
   if (! check_mhw_connection(mhwdb_conn)) { 
     warning("db connection invalid")
