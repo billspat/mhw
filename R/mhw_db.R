@@ -13,12 +13,12 @@ require(dbplyr)
 #' create a file `.Renviron` in main directory to use that, or in your own R project
 #' @export
 get_dbfile <- function() {
-  dbfile <- Sys.getenv('MHWDBFILE', unset='DB/mhwci.db')
+  dbfile <- Sys.getenv('MHWDBFILE')
   if(!file.exists(dbfile)){
     warning("could not automatically set the default 'dbfile' variable to a file that exists, please set it manually")
     rm(dbfile)
   } else {
-    warning(paste("default dbfile set to ", dbfile, " but can be overridden"))
+    warning(paste("default dbfile set to ", dbfile))
   }
   return(dbfile)
 }
