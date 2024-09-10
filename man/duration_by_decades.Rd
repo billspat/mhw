@@ -6,6 +6,14 @@
 \usage{
 duration_by_decades(mhwdb_conn, mhw_table)
 }
+\arguments{
+\item{mhwdb_conn}{database connection to a mhw database}
+
+\item{mhw_table}{character name of the table of ensembles to query}
+}
+\value{
+list of dataframes, one dataframe per decade, each data frame see avg_duration_by_decade_sql for
+}
 \description{
 calc mean duration by decade
 }
