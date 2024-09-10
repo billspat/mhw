@@ -88,6 +88,8 @@ plot_rasters_squish_outliers(raster_list = duration_rasters, title = duration_ti
 
 ```
 
+In this figure, any values above 99.5 percentile are combined or "squished" into the same color so that those huge outliers are still present but share the same color (red).  The legend still has to be corrected to include those high value or use the "break" method but that will take some work.  
+
 
 ### close database connection 
 
