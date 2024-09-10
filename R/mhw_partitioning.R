@@ -67,8 +67,6 @@ partition_mhw_events<- function(conn, mhw_table='mhw_metrics', partition_size_ye
 #'
 #' @returns list of subsets
 #' @export
-#'
-#' @examples
 windowing_overlap <- function(vec, seg.length, overlap=0) {
   starts = seq(1, length(vec), by=seg.length-overlap)
   ends   = starts + seg.length - 1
