@@ -34,7 +34,7 @@ be named anything.
     conn<- mhwci::mhw_connect(db_file)
     print(conn)
 
-    ## <duckdb_connection 050a0 driver=<duckdb_driver dbdir='/Users/billspat/tmp/mhwci.db' read_only=FALSE bigint=numeric>>
+    ## <duckdb_connection 2a690 driver=<duckdb_driver dbdir='/Users/billspat/tmp/mhwci.db' read_only=FALSE bigint=numeric>>
 
 ### Database Contents
 
@@ -102,7 +102,8 @@ use.
 
     duration_by_decade_histogram(conn, mhw_table, log_scale = TRUE)
 
-    ## Warning in scale_y_log10(): log-10 transformation introduced infinite values.
+    ## Warning in ggplot2::scale_y_log10(): log-10 transformation introduced infinite
+    ## values.
 
     ## Warning: Removed 36 rows containing missing values or values outside the scale range
     ## (`geom_bar()`).

@@ -7,15 +7,7 @@ date: "2024-09-03"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = FALSE)
-require(mhwci)
-require(terra)
-require(dplyr)
-require(duckdb)
-require(ggplot2)
-require(tidyterra)
-require(magrittr)
-
-
+devtools::load_all()
 ```
 
 ## Marine Heat Wave Climate Intervention Modelling Project
