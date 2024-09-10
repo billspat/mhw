@@ -77,7 +77,7 @@ avg_duration_by_decade_truncated <- function(mhw_table) {
 #' @export
 durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060')){
 
-  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
+  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
     return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs='EPSG:4326'))
    }
@@ -96,7 +96,7 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
 #' @returns list of dataframes, one dataframe per decade, each data frame see avg_duration_by_decade_sql for
 #' @export 
 duration_by_decades <- function(mhwdb_conn,mhw_table){
-  duration_by_loc<- dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
+  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
     return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
   }
@@ -110,7 +110,7 @@ duration_by_decades <- function(mhwdb_conn,mhw_table){
 duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
     
   # get rows of data for all decades in single table
-  duration_by_loc<- duckdb::dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
+  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
 
   # create list object, one item per decade
   filterfn <- function(decade_str)  { 
@@ -126,23 +126,3 @@ duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", lo
   g
 }
 
-#' @export 
-plot_decade_rasters <- function(mhwdb_conn, mhw_table){
-  if (! check_mhw_connection(mhwdb_conn)) { 
-    warning("db connection invalid")
-  }
-  
-  duration_rasters <- durations_by_decade_raster(mhwdb_conn, mhw_table)
-  
-  ggplot() +
-    geom_spatraster(data = duration_rasters) +
-    labs(
-      fill = "MHW Duration, d",
-      title = "Mean MHW Duration (days) by Decade of Onset",
-      subtitle = "by lat/lon point") +
-    facet_wrap(~lyr,ncol= 1) +
-    scale_fill_whitebox_c(
-      palette = "muted",
-      na.value = "white"
-    )
-}

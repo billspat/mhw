@@ -29,7 +29,7 @@ get_dbfile <- function() {
 #' 
 #' @param duckdbfilepath posix path to .duckdb file
 #' @param required_table_name name of table that must be in db to check for
-#' @returns duckdb DBI database connection object for use in dbGetQuery, etc or NA if not found
+#' @returns duckdb DBI database connection object for use in DBI::dbGetQuery, etc or NA if not found
 #' @export
 mhw_connect <- function(duckdbfilepath, required_table_name = "ensembles" ){
   stopifnot( file.exists(duckdbfilepath))
@@ -52,7 +52,7 @@ check_mhw_connection<- function(conn, known_table_name = 'ensembles'){
   
   n <- 10
   sql <- paste("select * from ", known_table_name, " limit ", n)
-  res <- duckdb::dbGetQuery(conn, sql)
+  res <- DBI::dbGetQuery(conn, sql)
   return(nrow(res) == n)
 }
 
@@ -85,7 +85,7 @@ mhw_table<- function(conn, table_name){
 #' @export 
 table_head<- function(conn, tablename, n = 10){
   sql = paste0("select * from ", tablename, " limit ", n)
-  res <- dbGetQuery(conn, sql)
+  res <- DBI::dbGetQuery(conn, sql)
   return(res)
 
 }
@@ -95,7 +95,7 @@ table_head<- function(conn, tablename, n = 10){
 #' useful for testing/exploration without creating large member objects
 sql_head<- function(conn, sql, n = 10){
   sql <- paste0(sql, " limit ", n)
-  res <- dbGetQuery(conn, sql)
+  res <- DBI::dbGetQuery(conn, sql)
   return(res)
   
 }
@@ -107,6 +107,6 @@ sql_head<- function(conn, sql, n = 10){
 #' this function is short but helps to remember the syntax 
 make_view<- function(conn, sql, viewname){
   view_sql = paste0("CREATE VIEW ", viewname, " AS ", sql)
-  res = dbExecute(conn, view_sql)
+  res = DBI::dbExecute(conn, view_sql)
   return(res)
 }

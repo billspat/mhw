@@ -53,19 +53,43 @@ plot_rasters_squish_outliers <- function(raster_list, title = "", cut_percent = 
   # where to cut off the values so that 
   cut_value <- percentile_cutoff_value(values(raster_list), cut_percent = cut_percent)
 
-  g<-ggplot() +
-    geom_spatraster(data = raster_list, inherit.aes = TRUE) +
-    labs(
+  g<-ggplot2::ggplot() +
+    tidyterra::geom_spatraster(data = raster_list, inherit.aes = TRUE) +
+    ggplot2::labs(
       fill = "MHW Duration, d",
       title = title,
       subtitle = paste("by lat/lon point, compressing top ", cut_percent, " percentile outliers")
       ) +
-    facet_wrap(~lyr,ncol= 1) + 
-    scale_fill_whitebox_c(
+    ggplot2::facet_wrap(~lyr,ncol= 1) + 
+    tidyterra::scale_fill_whitebox_c(
       palette = 'bl_yl_rd', 
       limits = c(min(values(raster_list)),cut_value), 
       oob = scales::squish) + 
-    theme_void()
+    ggplot2::theme_void()
   
   return(g)
+}
+
+#' plot of world rasters by layer, no outlier management
+#' 
+#' use plot_rasters_squish_outliers instead to plot mhw rasters
+#' @export 
+plot_decade_rasters <- function(mhwdb_conn, mhw_table){
+  if (! check_mhw_connection(mhwdb_conn)) { 
+    warning("db connection invalid")
+  }
+  
+  duration_rasters <- durations_by_decade_raster(mhwdb_conn, mhw_table)
+  
+  ggplot2::ggplot() +
+    tidyterra::geom_spatraster(data = duration_rasters) +
+    ggplot2::labs(
+      fill = "MHW Duration, d",
+      title = "Mean MHW Duration (days) by Decade of Onset",
+      subtitle = "by lat/lon point") +
+    ggplot2::facet_wrap(~lyr,ncol= 1) +
+    tidyterra::scale_fill_whitebox_c(
+      palette = "muted",
+      na.value = "white"
+    )
 }
