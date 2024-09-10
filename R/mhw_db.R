@@ -46,6 +46,7 @@ mhw_connect <- function(duckdbfilepath, required_table_name = "ensembles" ){
 #' check if connection works
 #' 
 #' test db connection by attempting to run SQL that should work, specific to this project
+#' @export
 check_mhw_connection<- function(conn, known_table_name = 'ensembles'){
   if(typeof(conn)!= "S4") return(FALSE)
   
@@ -81,6 +82,7 @@ mhw_table<- function(conn, table_name){
 #' @param n number of rows to return, default 10
 #' 
 #' @returns dataframe as result of query, or a promise of one for some db
+#' @export 
 table_head<- function(conn, tablename, n = 10){
   sql = paste0("select * from ", tablename, " limit ", n)
   res <- dbGetQuery(conn, sql)
