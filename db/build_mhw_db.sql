@@ -78,7 +78,7 @@ update arise10_metrics set lon = lon_index.lon from lon_index where arise10_metr
 create index arise10_onset_date_idx on arise10_metrics (mhw_onset_date);
 create index arise10_end_date_idx on arise10_metrics (mhw_end_date);
 
-create index lat_lon_idx on arise10_metrics (lat, lon);
+create index arise10_lat_lon_idx on arise10_metrics (lat, lon);
 
 
 -- ---------
@@ -134,7 +134,7 @@ update arise15_metrics set lon = lon_index.lon from lon_index where arise15_metr
 create index arise15_onset_date_idx on arise15_metrics (mhw_onset_date);
 create index arise15_end_date_idx on arise15_metrics (mhw_end_date);
 
-create index lat_lon_idx on arise15_metrics (lat, lon);
+create index arise15_lat_lon_idx on arise15_metrics (lat, lon);
 
 
 -- ------------
