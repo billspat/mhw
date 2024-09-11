@@ -20,7 +20,7 @@ print(duckdb::dbListTables(conn))
 
 
 # Each scenario has it's own table of marine heat wave metrics, so let's set that table name here
-mhw_table <-"arise15_metrics"
+mhw_table <-"ssp245_metrics"
 
 
 # You can run SQL command to get data using the duckdb database engine, which is very fast.  
