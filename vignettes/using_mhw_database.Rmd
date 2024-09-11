@@ -21,11 +21,8 @@ library(mhwci)
 This shows some basic commands to connect to the MHW-CI database, summarize data and plot. 
 
 
-If you are developing this package,  editing scriptsor adding packages, then this necessary 
+If you are developing this package,  editing scripts or adding packages, then run this in the console prior to this script: `devtools::load_all()`
 
-```{r echo=TRUE}
-devtools::load_all()
-```
 
 Here is a script that you can copy/paste into the console.  
 

@@ -1,9 +1,9 @@
-# source('R/mhw_db.R')  # use devtools::load_all() instead 
 require(terra)
 require(ggplot2)
 require(tidyterra)
 require(stringr)
 require(magrittr)
+require(duckdb)
 ## SQL 
 
 decades <- c('2040', '2050','2060')
