@@ -10,11 +10,12 @@ decades <- c('2040', '2050','2060')
 #' @param end_year integer year to end portioning
 #' @returns vector of integers, division of the range of inter 
 #' @export
-create_partion_table<-function(partition_size_years=3, start_year = 2040, end_year = 2069) {
+create_partion_df<-function(partition_size_years=3, start_year = 2040, end_year = 2069) {
   start_years<- seq(from = start_year, to = end_year, by = partition_size_years)
   start_dates<- as.Date(paste0(start_years, "-01-01"))
   end_dates <- as.Date(paste0( ( start_years + partition_size_years - 1), "-12-31"))
   partition.df = data.frame("partition" =  start_years, "start_date" = start_dates, "end_date" = end_dates)
+  
   return(partition.df)
 }
 
@@ -27,13 +28,16 @@ create_partion_table<-function(partition_size_years=3, start_year = 2040, end_ye
 #' @param use_end_date bolean deafult TRUE
 #' @returns data frame with partition value assigned to each event 
 #' @export
-partition_mhw_events<- function(conn, mhw_table='mhw_metrics', partition_size_years=3, start_year = 2040, end_year = 2069, use_end_date = TRUE){
+partition_mhw_events<- function(conn, mhw_table, partition_size_years=3, start_year = 2040, end_year = 2069, use_end_date = TRUE){
   
-  partitions <- create_partion_table(partition_size_years=3, start_year = 2040, end_year = 2069)
+  partitions <- create_partion_df(partition_size_years=3, start_year = 2040, end_year = 2069)
+  sql <- "CREATE OR REPLACE TEMP TABLE partitions as (partition INTEGER, start_date DATE, end_data DATE;"
+  DBI::dbExecute(conn, sql)
+  
   dplyr::copy_to(conn, partitions , overwrite = TRUE)  
   
-  event_table <- dplyr::tbl(conn, mhw_table)
-  partition_table <- dplyr::tbl(conn, "partitions")
+  #event_table <- dplyr::tbl(conn, mhw_table)
+  #partition_table <- dplyr::tbl(conn, "partitions")
   
   
   if(use_end_date){
@@ -50,7 +54,7 @@ partition_mhw_events<- function(conn, mhw_table='mhw_metrics', partition_size_ye
   sql <- (stringr::str_glue(sql_template))
   
   partition_events.df <- dbGetQuery(conn=conn, sql)
-  dbExecute(conn, "drop table partitions")
+
   return(partition_events.df)
   
 }

@@ -12,7 +12,7 @@ mhw_connect(duckdbfilepath, required_table_name = "ensembles")
 \item{required_table_name}{name of table that must be in db to check for}
 }
 \value{
-duckdb DBI database connection object for use in dbGetQuery, etc or NA if not found
+duckdb DBI database connection object for use in DBI::dbGetQuery, etc or NA if not found
 }
 \description{
 get connection, but also ensure it has at least one of the required tables

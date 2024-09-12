@@ -1,7 +1,4 @@
-# source('R/mhw_db.R') # use devtools::load_all() instead
-# require(terra)
-# require(ggplot2)
-# require(tidyterra)
+
 
 mhw_window_duration <- function(mhwdb_conn, window_size_years=2, truncate=TRUE, start_year = 2040, end_year = 2069){
 

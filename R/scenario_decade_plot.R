@@ -2,8 +2,8 @@
 
 # his assumes you have set the variable MHWDBFILE either in the `.Renviron` file or in the environment/shell before starting R/Rstudio.    
 # MHWDBFILE must be the full path to the database file.  You can set this manually in your scripts is prefered
+# in the console run dev_tools::load_all() to get your latest edits
 
-devtools::load_all()
 # read from the environment
 db_file <- get_dbfile()
 # OR set manually
@@ -20,7 +20,7 @@ print(duckdb::dbListTables(conn))
 
 
 # Each scenario has it's own table of marine heat wave metrics, so let's set that table name here
-mhw_table <-"arise15_metrics"
+mhw_table <-"ssp245_metrics"
 
 
 # You can run SQL command to get data using the duckdb database engine, which is very fast.  
