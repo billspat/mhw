@@ -60,12 +60,12 @@ check_mhw_connection<- function(conn, known_table_name = 'ensembles'){
 #' 
 #' @param conn  database connection 
 #' @param table_name character name of table
-#' @returns dbplyr table connection for use in dplyr syntax
+#' @returns dplyr table connection for use in dplyr syntax or a 
 #' @export 
 mhw_table<- function(conn, table_name){
   tblList <- duckdb::dbListTables(conn)
   if (table_name %in% tblList) {
-    return(dbplyr::tbl(conn, table_name))
+    return(dplyr::tbl(conn, table_name))
   } else {
     warning(paste("database does not have table", table_name))
     return(NA)
