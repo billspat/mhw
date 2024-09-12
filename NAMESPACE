@@ -2,6 +2,7 @@
 
 export(avg_duration_by_decade_sql)
 export(check_mhw_connection)
+export(create_partion_df)
 export(create_partion_table)
 export(decades)
 export(duration_by_decade_histogram)

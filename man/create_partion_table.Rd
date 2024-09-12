@@ -2,15 +2,18 @@
 % Please edit documentation in R/mhw_partitioning.R
 \name{create_partion_table}
 \alias{create_partion_table}
-\title{create table of start/end dates for year gaps}
+\title{create temporary partitions table}
 \usage{
 create_partion_table(
+  conn,
   partition_size_years = 3,
   start_year = 2040,
   end_year = 2069
 )
 }
 \arguments{
+\item{conn}{dbi database connection, see mhw_connect()}
+
 \item{partition_size_years}{integer width of partitions in whole years, not more than 10 usually}
 
 \item{start_year}{integer year to start partitioning (low end of range), default 2040}
@@ -18,8 +21,13 @@ create_partion_table(
 \item{end_year}{integer year to end portioning}
 }
 \value{
-vector of integers, division of the range of inter
+data frame copy of the table as created of with years, start_date, end_date
 }
 \description{
-create table of start/end dates for year gaps
+create a temporary table in the database of partitions named 'partitions', used 
+to create joins on metrics tables in-database rather than in
+R space using dplyr for speed and so can use SQL
+this function has the destructive side effect of overwriting existing partitions 
+table.  
+this will disappear when the connection is disconnected or garbage collected
 }

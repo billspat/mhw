@@ -2,11 +2,11 @@
 % Please edit documentation in R/mhw_partitioning.R
 \name{partition_mhw_events}
 \alias{partition_mhw_events}
-\title{create tabl assigning partition to each event}
+\title{assign partition to each event}
 \usage{
 partition_mhw_events(
   conn,
-  mhw_table = "mhw_metrics",
+  mhw_table_name,
   partition_size_years = 3,
   start_year = 2040,
   end_year = 2069,
@@ -16,7 +16,7 @@ partition_mhw_events(
 \arguments{
 \item{conn}{dbi database connection, see mhw_connect()}
 
-\item{mhw_table}{name of main metrics table to use}
+\item{mhw_table_name}{name of main metrics table to use}
 
 \item{partition_size_years}{width of partions in years}
 
@@ -27,8 +27,10 @@ partition_mhw_events(
 \item{use_end_date}{bolean deafult TRUE}
 }
 \value{
-data frame with partition value assigned to each event
+dbplyr 'table', data frame with partition value assigned to each event in column partition_start
 }
 \description{
-create tabl assigning partition to each event
+assign a partition_start (a year) to every event in the mhw metrics table 
+that is sent based on either start or end date of the mhw, the new column is called
+partition_start
 }
