@@ -20,14 +20,14 @@ print(duckdb::dbListTables(conn))
 
 
 # Each scenario has it's own table of marine heat wave metrics, so let's set that table name here
-mhw_table <-"ssp245_metrics"
+mhw_table_name <-"ssp245_metrics"
 
 
 # You can run SQL command to get data using the duckdb database engine, which is very fast.  
 
 # This SQL averages duration for the specific table 
 # this is a function that creates a string of SQL with the table we want to use
-sql<- avg_duration_by_decade_sql(mhw_table)
+sql<- avg_duration_by_decade_sql(mhw_table_name)
 print(sql)
 
 
@@ -39,10 +39,10 @@ head(duration_by_loc)
 
 
 # this does all the stuff above encapsulated into a function: 
-duration_rasters <- durations_by_decade_raster(conn, mhw_table)
+duration_rasters <- durations_by_decade_raster(conn, mhw_table_name)
 
 
 # create a map of these rasters that manages the outliers
 cut_percent = 0.5
-duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table)
+duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table_name)
 plot_rasters_squish_outliers(raster_list = duration_rasters, title = duration_title, cut_percent = 0.5 )
