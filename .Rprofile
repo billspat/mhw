@@ -6,4 +6,4 @@ if(Sys.getenv('HPCC_CLUSTER_FLAVOR')!='') {
   module("load", "PROJ")
   module("load", "GDAL")
 }
-source("renv/activate.R")
+# source("renv/activate.R")
