@@ -34,17 +34,18 @@ create_partition_df<-function(partition_size_years=3, start_year = 2040, end_yea
 #' @param end_year integer year to end portioning
 #' @returns data frame copy of the table as created of with partition_name, partition_start_date, partition_end_date
 #' @export
-create_partion_table<- function(conn, partition_size_years=3, start_year = 2040, end_year = 2069){
+create_partition_table<- function(conn, partition_size_years=3, start_year = 2040, end_year = 2069){
   
   table_name = 'partitions'
   
-  partitions.df <- create_partition_df(partition_size_years=3, start_year = 2040, end_year = 2069)
-  warning(paste("table '", table_name, "'is being replaced with new data with ", nrow(partitions.df), "rows"))
+  partitions.df <- create_partition_df(partition_size_years, start_year, end_year)
+  # warning(paste("table '", table_name, "'is being replaced with new data with ", nrow(partitions.df), "rows"))
   
-  sql <- paste("CREATE OR REPLACE TEMP TABLE ", table_name, " (partition_start INTEGER, partition_start_date DATE, partition_end_date DATE);")
-  DBI::dbExecute(conn, sql)
+  # sql <- paste("CREATE OR REPLACE TABLE ", table_name, " (partition_start INTEGER, partition_start_date DATE, partition_end_date DATE);")
+  #DBI::dbExecute(conn, sql)
+  duckdb::dbWriteTable(conn, name = table_name, value = partitions.df, overwrite=TRUE)
+  # dplyr::copy_to(conn, partitions.df, overwrite = TRUE) 
   
-  dplyr::copy_to(conn, partitions.df, overwrite = TRUE) 
   return(mhw_table(conn, table_name))
   
 }
@@ -67,7 +68,7 @@ partition_mhw_events<- function(conn, mhw_table_name, partition_size_years=3, st
   
   partition_table_name = 'partitions'
   
-  partitions<- create_partion_table(conn, partition_size_years=3, start_year = 2040, end_year = 2069)
+  partitions<- create_partition_table(conn, partition_size_years=3, start_year = 2040, end_year = 2069)
   if(use_end_date){
     where_clause <- "WHERE ((mhw_end_date >= partition_start_date) AND (mhw_end_date < partition_end_date))"
   } 
@@ -87,6 +88,61 @@ partition_mhw_events<- function(conn, mhw_table_name, partition_size_years=3, st
   
 }
 
+
+#' sql for partitioning
+#' 
+#' @param mhw_table_name name of main metrics table to use
+#' @param partition_size_years width of partions in years
+#' @param start_year year to start partitions default 2040
+#' @param end_year year to end partitions  default 2069
+#' @returns character sql to create new table of truncated mwh by partition
+#' @export
+partition_mhw_events_truncated_sql<- function(mhw_table_name, partition_size_years=3, start_year = 2040, end_year = 2069){
+  
+  partition_table_name = "partitions"
+  partition_duration_column_name = "partition_dur"
+  
+  # reusable sections of sql 
+  select_clause <- paste0("SELECT ", partition_table_name, ".*, ", mhw_table_name,".*, ")
+  from_clause <- paste0(" FROM ", mhw_table_name, ", ", partition_table_name, " ")
+  
+  # sql for all of mhw included in partition
+  sql_whole_mhw <- paste(select_clause,
+   "'whole' as mhw_portion, 
+   mhw_onset_date as mhw_portion_start,
+   mhw_end_date as mhw_portion_end,
+   (mhw_end_date - mhw_onset_date) as ", partition_duration_column_name,
+   from_clause,
+   " WHERE ((mhw_onset_date >= partition_start_date) AND (mhw_end_date <= partition_end_date))"
+   )
+  
+  # sql to collect waves that start before partition but ends inside partition
+  sql_end_portion <- paste(select_clause, 
+  "'end' as mhw_portion, 
+  partition_start_date as mhw_portion_start,
+  mhw_end_date as mhw_portion_end,
+  (mhw_end_date - partition_start_date) as ", partition_duration_column_name,
+  from_clause, 
+  " WHERE ((mhw_onset_date < partition_start_date) AND (mhw_end_date >= partition_start_date) AND (mhw_end_date <= partition_end_date))"
+  )
+  
+  # sql to collect waves that start inside partition but ends after
+  sql_start_portion <- paste(select_clause, 
+  "'start' as mhw_portion, 
+    mhw_onset_date as mhw_portion_start, partition_end_date as mhw_portion_end, (mhw_onset_date - partition_end_date) as ", partition_duration_column_name, 
+  from_clause, 
+  " WHERE ( (mhw_onset_date >= partition_start_date) AND (mhw_onset_date <= partition_end_date) AND (mhw_end_date > partition_end_date))"
+  )
+  
+  sql <- paste( sql_whole_mhw, " union ", sql_end_portion, " union ",sql_start_portion )
+
+  # remove the line breaks
+  return(gsub("[\n\r]", "", sql))
+}
+  
+
+
+
 #' table of truncated mhw metrics by partitions
 #' 
 #' given set of partions with dates, create table by matching waves to partions and truncated them 
@@ -102,69 +158,15 @@ partition_mhw_events<- function(conn, mhw_table_name, partition_size_years=3, st
 #' @export
 partition_mhw_events_truncated<- function(conn, mhw_table_name, partition_size_years=3, start_year = 2040, end_year = 2069){
   
-  partition_table_name = "partitions"
-  partition_duration_column_name = "partition_dur"
+  # partition_table_name = "partitions"
+  # partition_duration_column_name = "partition_dur"
+  
+  # generate sql string to run 
+  sql<- partition_mhw_events_truncated_sql(mhw_table_name, partition_size_years, start_year, end_year)
+  
   # create temp partitions table
-  partitions<- create_partion_table(conn, partition_size_years, start_year, end_year)
-  
-  # reusable sections of sql 
-  select_clause <- paste0("SELECT ", partition_table_name, ".*, ", mhw_table_name,".* ")
-  from_clause <- paste0(" FROM ", mhw_table_name, ", ", partition_table_name, " ")
-  
-  # sql for all of mhw included in partition
-  sql_whole_mhw <- " {select_clause}, 
-   'whole' as mhw_portion, 
-   mhw_onset_date as mhw_portion_start,
-   mhw_end_date as mhw_portion_end,
-   (mhw_end_date - mhw_onset_date) as {partition_duration_column_name}
-   {from_clause} 
-   WHERE (
-    (mhw_onset_date >= spartition_tart_date) 
-    AND 
-    (mhw_end_date <= partition_end_date)
-  )"
-  
-  # sql to collect waves that start before partition but ends inside partition
-  sql_end_portion <- " {select_clause}, 
-  'end'        as mhw_portion, 
-  partition_start_date   as mhw_portion_start,
-  mhw_end_date as mhw_portion_end,
-  (mhw_end_date - partition_start_date) as {partition_duration_column_name} 
-  {from_clause}
-  WHERE (
-    (mhw_onset_date < partition_start_date)
-    AND
-    (mhw_end_date >= partition_start_date)
-    AND
-    (mhw_end_date <= partition_end_date)
-    )"
-  
-  # sql to collect waves that start inside partition but ends after
-  sql_start_portion <- " {select_clause}, 
-  'start'        as mhw_portion, 
-  mhw_onset_date   as mhw_portion_start,
-  end_date as mhw_portion_end,
-  (mhw_end_date - partition_start_date)  as {partition_duration_column_name} 
-  (mhw_onset_date - partition_end_date) as {partition_duration_column_name} 
-  {from_clause} 
-    WHERE (
-    (mhw_onset_date >= partition_start_date)
-    AND
-    (mhw_onset_date <= partition_end_date)
-    AND
-    (mhw_end_date > partitions.end_date)
-    )"
-
-  
-  sql <- paste(
-    (stringr::str_glue(sql_start_portion)), 
-    " union "
-    (stringr::str_glue(sql_end_portion)), 
-    " union ",
-    (stringr::str_glue(sql_whole_mhw))
-  )
-    
-  truncated_mhw.df <- dbGetQuery(conn=conn, sql)
+  create_partition_table(conn, partition_size_years, start_year, end_year)
+  truncated_mhw.df <- DBI::dbGetQuery(conn=conn, sql)
   
   return(truncated_mhw.df)
   
