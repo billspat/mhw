@@ -7,4 +7,5 @@ renv
 data/**
 *.db
 *.duckdb
+*.wal
 
