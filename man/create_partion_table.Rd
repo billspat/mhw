@@ -21,7 +21,7 @@ create_partion_table(
 \item{end_year}{integer year to end portioning}
 }
 \value{
-data frame copy of the table as created of with years, start_date, end_date
+data frame copy of the table as created of with partition_name, partition_start_date, partition_end_date
 }
 \description{
 create a temporary table in the database of partitions named 'partitions', used 
