@@ -12,8 +12,9 @@ create table decades (decade CHAR, decade_start DATE, decade_end DATE);
 insert into  decades values 
     ('2040', DATE '2040-01-01', DATE '2049-12-31'),
     ('2050', DATE '2050-01-01', DATE '2059-12-31'), 
-    ('2060', '2060-01-01', DATE '2069-12-31');
+    ('2060', DATE '2060-01-01', DATE '2069-12-31');
 
+    
 -- get lat and lon from matlab index file export.  Used to replace xloc with lon and yloc with lat
 -- note the lat_ssp.csv is exported with "writematrix" which does not have a header row since writetable can't work with doubles
 create table lat_index as select column0 as lat, row_number() OVER () as yloc from 'lat_ssp.csv';
