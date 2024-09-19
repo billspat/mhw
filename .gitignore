@@ -12,3 +12,5 @@ plots/*.png
 plots/*.jpg
 plots/*.pdf
 plots/*.tif
+.DS_Store
+
