@@ -14,6 +14,13 @@ insert into  decades values
     ('2050', DATE '2050-01-01', DATE '2059-12-31'), 
     ('2060', DATE '2060-01-01', DATE '2069-12-31');
 
+-- table to distinguish historical period from future modeled period
+create table historical_decades(decade CHAR, decade_start DATE, decade_end DATE);
+insert into  historical_decades values 
+    ('1980', DATE '1980-01-01', DATE '1989-12-31'),
+    ('1990', DATE '1990-01-01', DATE '1999-12-31'), 
+    ('2000', DATE '2000-01-01', DATE '2009-12-31');
+    
     
 -- get lat and lon from matlab index file export.  Used to replace xloc with lon and yloc with lat
 -- note the lat_ssp.csv is exported with "writematrix" which does not have a header row since writetable can't work with doubles
