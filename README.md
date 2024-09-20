@@ -1,6 +1,4 @@
-## this was abandoned due to issues installing the 'terra' package and most work has continued in the folder `../mhw` 
-
-**mhwci: Marine Heat Wave for Climate Intervention**
+### mhwci: Marine Heat Wave for Climate Intervention
 
 *R package for database and analysis 'Marine Heat Waves during Climate Change & Climate Intervention' (in prep)*
 
