@@ -60,7 +60,7 @@ SELECT *, '008' AS ensemble, 'ARISE-1.0' AS scenario, 2060 as decade FROM 'ARISE
  union
 SELECT *, '009' AS ensemble, 'ARISE-1.0' AS scenario, 2060 as decade FROM 'ARISE-10/2040-2069/MHW_metrics_2060-2069_Model_009.mat.mhw.csv'
  union
-SELECT *, '010' AS ensemble, 'ARISE-1.0' AS scenario, 2060 as decade FROM 'ARISE-10/2040-2069/MHW_metrics_2060-2069_Model_010.mat.mhw.csv;
+SELECT *, '010' AS ensemble, 'ARISE-1.0' AS scenario, 2060 as decade FROM 'ARISE-10/2040-2069/MHW_metrics_2060-2069_Model_010.mat.mhw.csv';
 
 
 
@@ -77,8 +77,7 @@ alter table  arise10_decade_metrics add column lon DOUBLE;
 update  arise10_decade_metrics set lat = lat_index.lat from lat_index where  arise10_decade_metrics.yloc = lat_index.yloc ;
 update  arise10_decade_metrics set lon = lon_index.lon from lon_index where  arise10_decade_metrics.xloc = lon_index.xloc ;
 
-create index arise15_onset_date_idx on  arise10_decade_metrics (mhw_onset_date);
-create index arise15_end_date_idx on  arise10_decade_metrics (mhw_end_date);
-
-create index arise15_lat_lon_idx on  arise10_decade_metrics (lat, lon);
+create index arise10_decade_metrics_onset_date_idx on  arise10_decade_metrics (mhw_onset_date);
+create index arise10_decade_metrics_end_date_idx on  arise10_decade_metrics (mhw_end_date);
+create index arise10_decade_metrics_lat_lon_idx on  arise10_decade_metrics (lat, lon);
 

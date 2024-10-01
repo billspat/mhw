@@ -103,20 +103,19 @@ SELECT *, '009' AS ensemble, 'SSP-245' AS scenario, 2060 as decade FROM 'SSP-245
  union
 SELECT *, '010' AS ensemble, 'SSP-245' AS scenario, 2060 as decade FROM 'SSP-245/2015-2069/MHW_metrics_2060-2069_Model_010.mat.mhw.csv';
 
-alter table  ssp245_decade_metricsadd column mhw_onset_date DATE;
-alter table  ssp245_decade_metricsadd column mhw_end_date DATE;
+alter table  ssp245_decade_metrics add column mhw_onset_date DATE;
+alter table  ssp245_decade_metrics add column mhw_end_date DATE;
 
-update  ssp245_decade_metricsset mhw_onset_date = cast(strptime(cast(mhw_onset as varchar), '%Y%m%d') as date) , 
+update ssp245_decade_metrics set mhw_onset_date = cast(strptime(cast(mhw_onset as varchar), '%Y%m%d') as date) , 
                       mhw_end_date = cast(strptime(cast(mhw_end as varchar), '%Y%m%d') as date);
 
 
-alter table  ssp245_decade_metricsadd column lat DOUBLE;
-alter table  ssp245_decade_metricsadd column lon DOUBLE;
+alter table ssp245_decade_metrics add column lat DOUBLE;
+alter table ssp245_decade_metrics add column lon DOUBLE;
 
-update  ssp245_decade_metricsset lat = lat_index.lat from lat_index where  arise10_decade_metrics.yloc = lat_index.yloc ;
-update  ssp245_decade_metricsset lon = lon_index.lon from lon_index where  arise10_decade_metrics.xloc = lon_index.xloc ;
+update ssp245_decade_metrics set lat = lat_index.lat from lat_index where ssp245_decade_metrics.yloc = lat_index.yloc ;
+update ssp245_decade_metrics set lon = lon_index.lon from lon_index where ssp245_decade_metrics.xloc = lon_index.xloc ;
 
-create index arise15_onset_date_idx on  ssp245_decade_metrics(mhw_onset_date);
-create index arise15_end_date_idx on  ssp245_decade_metrics(mhw_end_date);
-
-create index arise15_lat_lon_idx on  ssp245_decade_metrics(lat, lon);
+create index ssp245_decade_metrics_onset_date_idx on ssp245_decade_metrics (mhw_onset_date);
+create index ssp245_decade_metrics_end_date_idx on ssp245_decade_metrics (mhw_end_date);
+create index ssp245_decade_metrics_lat_lon_idx on ssp245_decade_metrics (lat, lon);
