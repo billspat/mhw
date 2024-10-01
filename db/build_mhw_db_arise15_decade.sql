@@ -2,65 +2,65 @@
 -- requires build_mhw_db.sql scripts to run first
 
 create table arise15_decade_metrics as 
-SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_001.mat.mhw.csv
+SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_001.mat.mhw.csv'
  union
-SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_002.mat.mhw.csv
+SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_002.mat.mhw.csv'
  union
-SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_003.mat.mhw.csv
+SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_003.mat.mhw.csv'
  union
-SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_004.mat.mhw.csv
+SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_004.mat.mhw.csv'
  union
-SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_005.mat.mhw.csv
+SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_005.mat.mhw.csv'
  union
-SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_006.mat.mhw.csv
+SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_006.mat.mhw.csv'
  union
-SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_007.mat.mhw.csv
+SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_007.mat.mhw.csv'
  union
-SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_008.mat.mhw.csv
+SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_008.mat.mhw.csv'
  union
-SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_009.mat.mhw.csv
+SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_009.mat.mhw.csv'
  union
-SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2040-2049_Model_010.mat.mhw.csv
+SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario, 2040 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2049_Model_010.mat.mhw.csv'
  union
-SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_001.mat.mhw.csv
+SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_001.mat.mhw.csv'
  union
-SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_002.mat.mhw.csv
+SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_002.mat.mhw.csv'
  union
-SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_003.mat.mhw.csv
+SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_003.mat.mhw.csv'
  union
-SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_004.mat.mhw.csv
+SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_004.mat.mhw.csv'
  union
-SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_005.mat.mhw.csv
+SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_005.mat.mhw.csv'
  union
-SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_006.mat.mhw.csv
+SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_006.mat.mhw.csv'
  union
-SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_007.mat.mhw.csv
+SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_007.mat.mhw.csv'
  union
-SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_008.mat.mhw.csv
+SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_008.mat.mhw.csv'
  union
-SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_009.mat.mhw.csv
+SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_009.mat.mhw.csv'
  union
-SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2050-2059_Model_010.mat.mhw.csv
+SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario, 2050 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2059_Model_010.mat.mhw.csv'
  union
-SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_001.mat.mhw.csv
+SELECT *, '001' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_001.mat.mhw.csv'
  union
-SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_002.mat.mhw.csv
+SELECT *, '002' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_002.mat.mhw.csv'
  union
-SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_003.mat.mhw.csv
+SELECT *, '003' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_003.mat.mhw.csv'
  union
-SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_004.mat.mhw.csv
+SELECT *, '004' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_004.mat.mhw.csv'
  union
-SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_005.mat.mhw.csv
+SELECT *, '005' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_005.mat.mhw.csv'
  union
-SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_006.mat.mhw.csv
+SELECT *, '006' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_006.mat.mhw.csv'
  union
-SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_007.mat.mhw.csv
+SELECT *, '007' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_007.mat.mhw.csv'
  union
-SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_008.mat.mhw.csv
+SELECT *, '008' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_008.mat.mhw.csv'
  union
-SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_009.mat.mhw.csv
+SELECT *, '009' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_009.mat.mhw.csv'
  union
-SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario FROM 'ARISE-15/2040-2069/MHW_metrics_2060-2069_Model_010.mat.mhw.csv;
+SELECT *, '010' AS ensemble, 'ARISE-1.5' AS scenario, 2060 as decade FROM 'ARISE-15/2040-2069/MHW_metrics_20%10-2069_Model_010.mat.mhw.csv';
 
 
 
