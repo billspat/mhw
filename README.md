@@ -10,7 +10,7 @@ Authors:
 
 ## Overview
 
-[Package documentation](site/index.html)
+[Package documentation](https://srm-ecology.github.io/mhwci/)
 
 This is a **work in progress** and incomplete.  Any results or visualizations shown are **draft** form and not 
 to be considered the final results or any statements made by the the authors at this point.   
