@@ -1,0 +1,9 @@
+pandoc: '3.2'
+pkgdown: 2.1.0
+pkgdown_sha: ~
+articles:
+  using_mhw_database: using_mhw_database.html
+last_built: 2024-10-04T05:07Z
+urls:
+  reference: https://srm-ecology.github.io/mhwci/reference
+  article: https://srm-ecology.github.io/mhwci/articles
