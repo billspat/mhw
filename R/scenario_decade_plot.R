@@ -4,64 +4,36 @@
 # MHWDBFILE must be the full path to the database file.  You can set this manually in your scripts is prefered
 # in the console run dev_tools::load_all() to get your latest edits
 
-test_plot<- function() {
+#' plot a series of MHW tables as maps and histograms
+#' 
+#' @param mhw_tables vector of character names of tables to plot
+#' @param conn database connection to use with mhw functions
+#' @param threshold numeric common value to use to constrain scale of all plots, see plot_rasters_squish_outliers, default 365/2
+#' @param pdf_file_name optional character if set, will be used as a path to a pdf file
+#' @returns plots or path to plots
+#' @examples
+#' \dontrun{
+#' db_file = get_dbfile()
+#' db <- mhw_connect(db_file)
+#' mhw_tables <- c('arise10_decade_metrics','arise15_decade_metrics','ssp245_decade_metrics' )
+#' generate_duration_plots(mhw_tables, conn= db, threshold = 150, pdf_file_name = 'duration_plots.pdf')
+#' }
 
-    # read from the environment
-    db_file <- get_dbfile()
-    # OR set manually
-    # db_file = "/full/path/to/mhwci.b"
-    
-    # Optional check that the `db_file` is a file that can be found from your script.
-    # this halts the program if the dbfile can't be found
-    stopifnot(file.exists(db_file))
-    
-    # Get connected
-    conn<- mhw_connect(db_file)
-    # optionally just showing that we have an actual connect
-    print(duckdb::dbListTables(conn))
-    
-    
-    # Each scenario has it's own table of marine heat wave metrics, so let's set that table name here
-    mhw_table_name <-"ssp245_metrics"
-    
-    # You can run SQL command to get data using the duckdb database engine, which is very fast.
-    
-    # This SQL averages duration for the specific table
-    # this is a function that creates a string of SQL with the table we want to use
-    sql<- avg_duration_by_decade_sql(mhw_table_name)
-    print(sql)
-    
-    
-    # Here is how you run a query using the `dbGetQuery` command.
-    duration_by_loc<- DBI::dbGetQuery(conn, sql)
-    # that didn't take long
-    print('data sample')
-    head(duration_by_loc)
-    
-    
-    # this does all the stuff above encapsulated into a function:
-    duration_rasters <- durations_by_decade_raster(conn, mhw_table_name)
-    
-    
-    # create a map of these rasters that manages the outliers
-    cut_percent = 0.5
-    duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table_name)
-    plot_rasters_squish_outliers(raster_list = duration_rasters, title = duration_title, cut_percent = 0.5 )
-}
+#' @export
+generate_duration_plots<- function(mhw_tables, conn, threshold = 365/2, pdf_file_name = NULL) {
 
-#####
-# partition test
-test_partitioning <- function() {
-  db_file <- get_dbfile()
-  mhw_table_name <-"ssp245_metrics"
-  conn<- mhw_connect(db_file)
-  partition_size_years=3
-  start_year = 2040
-  end_year = 2069
-
-  sql <- partition_mhw_events_truncated_sql(mhw_table_name, partition_size_years, start_year, end_year)
+  if(! is.null(pdf_file_name)) {
+    pdf(pdf_file_name)
+  }
   
-  mwh_portions <- partition_mhw_events_truncated(conn, mhw_table_name, partition_size_years, start_year, end_year)
-  #head(mhw_p0rtions)
-
+  for(mhw_table_name in mhw_tables){
+      raster_list <- durations_by_decade_raster(conn, mhw_table_name)
+      duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table_name)
+      print(plot_rasters_squish_outliers(raster_list = raster_list, title = duration_title, threshold = threshold ))
+      
+      # plot histograms here
+  }
+  
+  dev.off()
 }
+
