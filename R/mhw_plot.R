@@ -50,7 +50,7 @@ percentile_cutoff_value<- function(x, cut_percent = 1){
 #' @param threshold_value numeric optional numeric cut off the range display.  if this is sent, then cut_percent is ignored 
 #' @returns ggplot object, one map for each item in raster_list with single legend 
 #' @export
-plot_rasters_squish_outliers <- function(raster_list, title = "",  cut_percent = 0, threshold_value = NA){
+plot_rasters_squish_outliers <- function(raster_list, title = "", mhw_metric = "MHW Duration, d", cut_percent = 0, threshold_value = NA){
   # where to cut off the values so that 
   if( is.na(threshold_value)){
     # if cut percent is 0, will not cut of the range
@@ -70,7 +70,7 @@ plot_rasters_squish_outliers <- function(raster_list, title = "",  cut_percent =
   g<-ggplot2::ggplot() +
     tidyterra::geom_spatraster(data = raster_list, inherit.aes = TRUE) +
     ggplot2::labs(
-      fill = = "MHW Duration, d",
+      fill = mhw_metric,
       title = title,
       subtitle = subtitle
     ) +
@@ -106,4 +106,25 @@ plot_decade_rasters <- function(mhwdb_conn, mhw_table){
       palette = "muted",
       na.value = "white"
     )
+}
+
+
+#' @export
+duration__histogram<-function(raster_list, log_scale = FALSE){
+  
+  # get rows of data for all decades in single table
+  # duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
+  
+  # create list object, one item per decade
+  # filterfn <- function(decade_str)  { 
+  #   return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
+  # }
+  
+  # d_list <- lapply(decades, filterfn)
+  
+  d<- lapply(raster_list, function(x) {dplyr::select(x, mhw_dur)})
+  d<- dplyr::bind_rows(d, .id = "id")
+  g = ggplot2::ggplot(d, ggplot2::aes(mhw_dur)) + ggplot2::geom_histogram(bins=100)+ ggplot2::facet_wrap(~id)
+  if(log_scale) g = g + ggplot2::scale_x_log10() + ggplot2::scale_y_log10() 
+  g
 }
