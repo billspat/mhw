@@ -1,6 +1,6 @@
-#' mhw_matlab.R
-#' Marine Heat Wave Project
-#' This is not used, but was an early experiment reading Dr. Kounta's Matlab output and plotting
+# mhw_matlab.R
+# Marine Heat Wave Project
+# This is not used, but was an early experiment reading Dr. Kounta's Matlab output and plotting
 
 library(R.matlab)
 library(sf)
