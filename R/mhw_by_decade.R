@@ -29,7 +29,7 @@ duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   sql <- "SELECT lat, lon, decade, mhw_dur 
     FROM {mhw_table}, decades 
     {where_clause}"
-    
+  
   # GROUP BY lat, lon, decade"  
   return(stringr::str_glue(sql))
   
@@ -83,6 +83,31 @@ avg_duration_by_decade_truncated_sql <- function(mhw_table, start_year=2040, end
   return(sql)
 }
 
+#' SQL template for all MHW metrics
+#' 
+#' this is a convenience function to construct sql to group by decades for one of the metrics
+#' calculating the decade and grouping is tricky so that wraps that.  
+#' @param mhw_table name of the table to use
+#' @param mhw_metric character name of column in table, mhw_dur, int_mean, etc
+#' @param sqlfun character aggregate function for duckdb, see https://duckdb.org/docs/sql/functions/aggregates
+#' @param start_year integer year to start, inclusive (dates will include this start year)
+#' @param end_year integer year to end, inclusive (dates will include up to 12/31 of the end year)
+#' @returns character SQL code to run on the MHW database
+#' @export
+metric_by_decade_sql <- function(mhw_table, mhw_metric = 'int_mean', sql_function = 'avg', start_year=2040, end_year=2069) {
+  
+  sql_template <- "SELECT lat, lon, (mhw_onset - mod(mhw_onset,100000))/10000 as decade,
+  {sql_function}({mhw_metric}) as {sql_function}_{mhw_metric}, 
+  FROM {mhw_table} 
+  WHERE (mhw_onset/10000) >= {start_year} and ((mhw_onset - mod(mhw_onset,10000))/10000) <= {end_year}
+  GROUP BY lat, lon, decade ORDER by decade, lat, lon"
+  
+  sql <- glue::glue(sql_template)
+  
+  return(sql)
+}
+
+
 #' rasters of global heatwave duration per decade
 #' 
 #' a raster with layers by decade 
@@ -92,7 +117,7 @@ avg_duration_by_decade_truncated_sql <- function(mhw_table, start_year=2040, end
 #' @returns terra raster stack of layers for each decade
 #' @export
 durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060'), crs='EPSG:4087'){
-
+  
   # sql = avg_duration_by_decade_sql(mhw_table)
   sql = avg_duration_by_decade_truncated_sql(mhw_table)
   # calculate the average duration by coordinate (see sql function above for specifics)
@@ -100,8 +125,8 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
   
   filterfn <- function(decade_str)  { 
     return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs=crs))
-   }
-
+  }
+  
   # apply function to get a list 
   d_list <- sapply(decades, filterfn)
   # stack the rasters into layers, climate data is 0 to 360, use rotate to make -180 to 180
@@ -110,6 +135,41 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
   return(rotated_raster_list)
 }
 
+
+#' rasters of global heatwave duration per decade
+#' 
+#' a raster with layers by decade 
+#' @param mhwdb_conn database connection
+#' @param mhw_table character string name of the table to query, required (e.g. arise10_metrics)
+#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326. 
+#' @returns terra raster stack of layers for each decade
+#' @export
+metrics_by_decade_raster <- function(mhwdb_conn, mhw_table, mhw_metric = 'int_mean', sql_function = 'avg', decades = c('2040', '2050','2060'), crs='EPSG:4087'){
+  
+  # create sql to calculate the metric by coordinate (see sql function above for specifics)
+  sql <- metric_by_decade_sql(mhw_table, 
+                              mhw_metric, 
+                              sql_function, 
+                              start_year = as.numeric(decades[1]), 
+                              end_year = as.numeric(decades[length(decades)])+9
+  )
+  
+  # this is copied from the metric_by_decade_sql and must be changed if that function is changed
+  metric_column_name = glue::glue('{sql_function}_{mhw_metric}')
+  
+  metric_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, sql)
+  
+  filterfn <- function(decade_str)  { 
+    return ( filter(metric_by_loc, decade == decade_str) %>% select(lon, lat, !!as.symbol(metric_column_name)) %>% terra::rast(type="xyz", crs=crs))
+  }
+  
+  # apply function to get a list 
+  d_list <- sapply(decades, filterfn)
+  # stack the rasters into layers, climate data is 0 to 360, use rotate to make -180 to 180
+  raster_list <-terra::rast(d_list)
+  rotated_raster_list <- terra::rotate(raster_list)
+  return(rotated_raster_list)
+}
 
 #' calc mean duration by decade
 #' 
@@ -123,24 +183,24 @@ duration_by_decades <- function(mhwdb_conn,mhw_table){
     return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
   }
   d_list <- lapply(decades, filterfn)
-
+  
   return(d_list)
 }
 
 
 #' @export 
 duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", log_scale = FALSE){
-    
+  
   # get rows of data for all decades in single table
   duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, duration_by_decade_sql(mhw_table))
-
+  
   # create list object, one item per decade
   filterfn <- function(decade_str)  { 
-      return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
-    }
+    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
+  }
   
   d_list <- lapply(decades, filterfn)
-    
+  
   d<- lapply(d_list, function(x) {dplyr::select(x, mhw_dur)})
   d<- dplyr::bind_rows(d, .id = "id")
   g = ggplot2::ggplot(d, ggplot2::aes(mhw_dur)) + ggplot2::geom_histogram(bins=100)+ ggplot2::facet_wrap(~id)
