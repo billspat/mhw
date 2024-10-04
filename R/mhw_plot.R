@@ -47,19 +47,33 @@ percentile_cutoff_value<- function(x, cut_percent = 1){
 #' @param title character title of the plot, default is empty title
 #' @param cut_percent numeric percentile cut-off, see percentile_cutoff_value function for descriptoin, but 1 
 #' will cut top 1 percent, 0.25 will cut to 0.25% off and display as top color (e.g. red)
+#' @param threshold_value numeric optional numeric cut off the range display.  if this is sent, then cut_percent is ignored 
 #' @returns ggplot object, one map for each item in raster_list with single legend 
 #' @export
-plot_rasters_squish_outliers <- function(raster_list, title = "", cut_percent = 0 ){
+plot_rasters_squish_outliers <- function(raster_list, title = "",  cut_percent = 0, threshold_value = NA){
   # where to cut off the values so that 
-  cut_value <- percentile_cutoff_value(values(raster_list), cut_percent = cut_percent)
-
+  if( is.na(threshold_value)){
+    # if cut percent is 0, will not cut of the range
+    cut_value <- percentile_cutoff_value(values(raster_list), cut_percent = cut_percent)  
+    if( cut_percent > 0) {
+      subtitle = paste("by lat/lon point, compressing top ", cut_percent, " percentile outliers") 
+    } else {
+      subtitle = ""
+    }
+  } else {
+    # TODO check that threshold_value is in range? 
+    cut_value <- threshold_value
+    subtitle = paste("compressed all values above ", threshold_value) 
+  }
+  
+  
   g<-ggplot2::ggplot() +
     tidyterra::geom_spatraster(data = raster_list, inherit.aes = TRUE) +
     ggplot2::labs(
-      fill = "MHW Duration, d",
+      fill = = "MHW Duration, d",
       title = title,
-      subtitle = paste("by lat/lon point, compressing top ", cut_percent, " percentile outliers")
-      ) +
+      subtitle = subtitle
+    ) +
     ggplot2::facet_wrap(~lyr,ncol= 1) + 
     tidyterra::scale_fill_whitebox_c(
       palette = 'bl_yl_rd', 
