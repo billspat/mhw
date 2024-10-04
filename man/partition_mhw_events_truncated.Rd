@@ -2,7 +2,9 @@
 % Please edit documentation in R/mhw_partitioning.R
 \name{partition_mhw_events_truncated}
 \alias{partition_mhw_events_truncated}
-\title{table of truncated mhw metrics by partitions}
+\title{mhw_partitioning.R
+this is a work in progress (WIP) and not complete
+table of truncated mhw metrics by partitions}
 \usage{
 partition_mhw_events_truncated(
   conn,
@@ -29,5 +31,5 @@ dplyr table with fields from mhw table, partition table (partition_name, partiti
          mhw_portion_end = end date of truncate wave, partition_dur = duration in days of truncated wave
 }
 \description{
-given set of partions with dates, create table by matching waves to partions and truncated them
+given set of partitions with dates, create table by matching waves to partions and truncated them
 }
