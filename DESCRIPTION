@@ -33,3 +33,4 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+URL: https://billspat.github.io/mhw/, https://srm-ecology.github.io/mhwci/

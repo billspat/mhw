@@ -10,21 +10,25 @@ Authors:
 
 ## Overview
 
-Continuation of Dr. Lala Kounta's project <https://github.com/srm-ecology/MHW_climateintervention>
+This is a **work in progress** and incomplete.  Any results or visualizations shown are **draft** form and not 
+to be considered the final results or any statements made by the the authors at this point.   
+Description of the purpose, data sources, model basis etc are forth coming. 
 
-Uses the EDI data frame work (more to come)
+This 'package' is for internal use only until publication of the paper, and is a continuation of Dr. Lala Kounta's project https://github.com/srm-ecology/MHW_climateintervention
+
+Uses the EDI data framework (more to come)
 
 ## Requirements/Install
 
-For most code to work, there must be a database created from Matlab work from L0 level files. Build instructions are forthcoming, but see files in `matlab` and `db` folder
+This package relies on the [terra]() package which also requires Gdal libraries to be installed on your computer. 
+
+Data is stored in a database file, not Rdata files.   The database is constructed from exported CSV files and SQL code in the `/db' folder
 
 The database is in [duckdb](https://duckdb.org) format, an open source, in-process columnar database for analytics. The climate data prepared will create a database with tables with over 20M rows.
 
-By default, the code looks for this database the file `db/mhwmetrics.duckdb` but the path to the database you would like can be sent to function `mhw_connect(path/to/database.duckdb)` or set in the environment as `$MHWDBFILE`
+See the vignette for instructions on specifying the path to the database file to work with. 
 
-This uses the 'terra' package for geospatial operations. However this require the gdal library to be installed and available on your system. See <https://github.com/rspatial/terra> for instructions on installing terra and gdal on your system (especially for MacOS using homebrew). Note that most HPC systems have gdal installed and can be loaded the "module system" (eg. lmod) and must be loaded first.
-
-### Usage on MSU HPC
+### Note about Usage on MSU HPC
 
 When running on your own computer, you install the software you need.  The MSU HPC uses the ['module system'](https://docs.icer.msu.edu/Intro_to_modules/) to select software already installed.  This application requires the following modules to be loaded: 
 
@@ -49,8 +53,7 @@ if(Sys.getenv('HPCC_CLUSTER_FLAVOR')!='') {
   
 This will only run if you are running on the MSU HPC and load the modules needed when R starts up. 
 
-IF you are also using the [`renv`](https://rstudio.github.io/renv/articles/renv.html) system to create an R Environment to manage packages for this project then you may already have a file `.Rprofile` and if you add modules they must come before the renve activate commands.   Most projects do not put the .Rprofile file into git but this one does to share the module load commands. 
-
 
 ## Basic Usage
 
+See the articles linked above or the R markdown file in the `vignettes` folder. 
