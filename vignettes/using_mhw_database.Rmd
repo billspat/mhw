@@ -8,6 +8,8 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+knitr::clean_cache(clean = TRUE)
+
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
@@ -15,6 +17,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(magrittr)
 library(mhwci)
 ```
 
@@ -23,46 +26,124 @@ This shows some basic commands to connect to the MHW-CI database, summarize data
 
 If you are developing this package,  editing scripts or adding packages, then run this in the console prior to this script: `devtools::load_all()`
 
+This package requires a database file that stores all the data. You have to create a database 'connection' first
 
-Here is a script that you can copy/paste into the console.  
+You can type the filename in a variable 
 
-This assumes you have set the variable MHWDBFILE either in the `.Renviron` file or in the environment/shell before starting R/Rstudio.    
-
-MHWDBFILE must be the full path to the database file.  You can set this manually in your scripts is prefered
-
-
-```
+```{r, echo=TRUE}
 # read from the environment
-db_file <- get_dbfile()
+db_file <- "db/mhwci_v3.db"
 ```
 
-OR 
+or you can set the path to the database file in an  `.Renviron` file like this
+
+`MHWDBFILE=/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db`
+
+Note that MHWDBFILE must be the full path to the database file.  If you do set it in the `.Renviron` file, then you can use this function:
+
+```{r, echo=TRUE}
+# read from the environment
+db_file <- mhwci::get_dbfile()
+```
+
+Then you need to create a connection object: 
+
+```{r, echo=TRUE}
+db<- mhwci::mhw_connect(db_file)
+print(db)
+```
+
+This isn't actually the database, just a connection to it required for all database functions. 
+
+Now you could list the tables in the database:
+
+```{r, echo=TRUE}
+print(duckdb::dbListTables(db))
+```
+
+The database has a table for each scenario, listed above, and a few other support tables.  This package has a quick function to look at the first few rows of a table, similar to the Unix `head` command.  
+
+```{r, echo=TRUE}
+
+mhwci::table_head(db,"ssp245_decade_metrics")
 
 ```
-# set manually
-db_file = "/full/path/to/mhwci.b"
+## Calculating Metrics
+
+Set the scenario table to use for this plot. 
+
+```{r, echo=TRUE}
+mhw_table <-"arise10_decade_metrics"
 ```
 
+This function queries this table for average durations by point and decade into data frames with x, y and value, and then uses the `terra` package to create the rasters of those decades in a list.  It also rotates the world plots so that the center is along the prime meridian instead of the dateline. 
+
+```{r, echo=TRUE}
+raster_list <- durations_by_decade_raster(db, mhw_table)
 ```
-# Optional check that the `db_file` is a file that can be found from your script. 
 
-file.exists(db_file))
+Plot this list of rasters, setting the name of the metric (average duration) and the threshold of 1/2 year
 
-# Get connected
-conn<- mhw_connect(db_file)
-# optionally just showing that we have an actual connect
-print(duckdb::dbListTables(conn))
+```{r, echo=TRUE}
+plot_rasters_squish_outliers(raster_list, title = "ARISE 1.0 Average Duration", 
+                             mhw_metric = "Mean Duration, d", 
+                             threshold = 365/2)
 
-
-# Each scenario has it's own table of marine heat wave metrics, so let's set that table name here
-mhw_table <-"arise15_metrics"
 ```
+
+
+## Plot duration other scenarios
+
+Combine the commands above to plot the other scenarios.  Note we change the title manually.  This re-uses the connection object `db` we created above.   The `duration_rasters()` function calls the function to create and run the SQL on the database
+
+```{r, echo=TRUE}
+raster_list <- durations_by_decade_raster(db, mhw_table= "arise15_decade_metrics")
+plot_rasters_squish_outliers(raster_list, title = "ARISE 1.5 Average Duration", 
+                             mhw_metric = "Mean Duration, d", 
+                             threshold = 365/2)
+
+
+```
+```{r, echo=TRUE}
+raster_list <- durations_by_decade_raster(db, mhw_table= "ssp245_decade_metrics")
+plot_rasters_squish_outliers(raster_list, title = "SSP2 4.5 Average Duration", 
+                             mhw_metric = "Mean Duration, d", 
+                             threshold = 365/2)
+
+
+```
+
+## Plot other metrics and summaries
+
+There are functions to summary any of the metrics with various statistics (mean, median, min, max, mode, etc)
+
+Let's take the average of the average intensity
+
+```{r, echo=TRUE}
+# set the table
+mhw_table <- "arise10_decade_metrics"
+# select the metric or column in the table above
+mhw_metric <- 'int_mean'
+# select the summary function, must be one of the SQL functions, not an R function
+sql_function <- 'avg'
+
+#create the rasters for each decade for this metric, similar to duration but tis is a generic function
+raster_list <- metrics_by_decade_raster(db, mhw_table, mhw_metric = mhw_metric, sql_function = sql_function)
+
+# plot, constructing the title from the variables we set above
+# no threshold is set
+plot_rasters_squish_outliers(raster_list, 
+                             title = paste(mhw_table, mhw_metric, sql_function), 
+                             mhw_metric = "avg intensity average, c" )
+```
+ 
+## Using SQL directly 
 
 You can run SQL command to get data using the duckdb database engine, which is very fast.  
 
 This SQL averages duration for the specific table 
 
-```{r echo=TRUE}
+```{r, echo=TRUE}
 # this is a function that creates a string of SQL with the table we want to use
 sql<- avg_duration_by_decade_sql(mhw_table)
 print(sql)
@@ -71,24 +152,10 @@ print(sql)
 
 Here is how you run a query: 
 
-```{r echo=TRUE}
+```{r, echo=TRUE}
 # run this SQL using the `dbGetQuery` command.  
-duration_by_loc<- DBI::dbGetQuery(conn, sql)
-
+duration_by_loc<- DBI::dbGetQuery(db, sql)
+# show the first few rows
 head(duration_by_loc)
 ```
 
-this does all the stuff above encapsulated into a function: 
-
-```{r echo=TRUE}
-duration_rasters <- durations_by_decade_raster(conn, mhw_table)
-```
-
-create a map of these rasters that manages the outliers
-
-```{r echo=TRUE}
-cut_percent = 0.5
-duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table)
-
-plot_rasters_squish_outliers(raster_list = duration_rasters, title = duration_title, cut_percent = 0.5 )
-```
