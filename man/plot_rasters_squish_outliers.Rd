@@ -4,7 +4,13 @@
 \alias{plot_rasters_squish_outliers}
 \title{plot terra rasters, but manage outliers}
 \usage{
-plot_rasters_squish_outliers(raster_list, title = "", cut_percent = 0)
+plot_rasters_squish_outliers(
+  raster_list,
+  title = "",
+  mhw_metric = "MHW Duration, d",
+  cut_percent = 0,
+  threshold_value = NA
+)
 }
 \arguments{
 \item{raster_list}{terra spat raster list (or stack?)}
@@ -13,6 +19,8 @@ plot_rasters_squish_outliers(raster_list, title = "", cut_percent = 0)
 
 \item{cut_percent}{numeric percentile cut-off, see percentile_cutoff_value function for descriptoin, but 1 
 will cut top 1 percent, 0.25 will cut to 0.25% off and display as top color (e.g. red)}
+
+\item{threshold_value}{numeric optional numeric cut off the range display.  if this is sent, then cut_percent is ignored}
 }
 \value{
 ggplot object, one map for each item in raster_list with single legend
