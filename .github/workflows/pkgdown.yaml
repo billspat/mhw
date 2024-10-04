@@ -24,6 +24,13 @@ jobs:
     permissions:
       contents: write
     steps:
+
+      - name: Install sudo
+        run: sudo apt-get update && sudo apt-get install -y sudo
+
+      - name: gis deps
+        run: sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable && sudo apt-get update && sudo apt-get install libgdal-dev libgeos-dev libproj-dev 
+
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
