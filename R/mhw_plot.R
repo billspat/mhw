@@ -54,7 +54,7 @@ plot_rasters_squish_outliers <- function(raster_list, title = "", mhw_metric = "
   # where to cut off the values so that 
   if( is.na(threshold_value)){
     # if cut percent is 0, will not cut of the range
-    cut_value <- percentile_cutoff_value(values(raster_list), cut_percent = cut_percent)  
+    cut_value <- percentile_cutoff_value(terra::values(raster_list), cut_percent = cut_percent)  
     if( cut_percent > 0) {
       subtitle = paste("by lat/lon point, compressing top ", cut_percent, " percentile outliers") 
     } else {
@@ -77,7 +77,7 @@ plot_rasters_squish_outliers <- function(raster_list, title = "", mhw_metric = "
     ggplot2::facet_wrap(~lyr,ncol= 1) + 
     tidyterra::scale_fill_whitebox_c(
       palette = 'bl_yl_rd', 
-      limits = c(min(values(raster_list)),cut_value), 
+      limits = c(min(terra::values(raster_list)),cut_value), 
       oob = scales::squish) + 
     ggplot2::theme_void()
   

@@ -33,7 +33,7 @@ get_dbfile <- function() {
 #' @export
 mhw_connect <- function(duckdbfilepath, required_table_name = "ensembles" ){
   stopifnot( file.exists(duckdbfilepath))
-  conn <- duckdb::dbConnect(duckdb(), dbdir = duckdbfilepath)
+  conn <- DBI::dbConnect(duckdb::duckdb(), dbdir = duckdbfilepath)
   tblList <- duckdb::dbListTables(conn)
   if (required_table_name %in% tblList) {
     return(conn)

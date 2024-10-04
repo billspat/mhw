@@ -124,7 +124,7 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
   duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, sql)
   
   filterfn <- function(decade_str)  { 
-    return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs=crs))
+    return ( dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs=crs))
   }
   
   # apply function to get a list 
@@ -160,7 +160,7 @@ metrics_by_decade_raster <- function(mhwdb_conn, mhw_table, mhw_metric = 'int_me
   metric_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, sql)
   
   filterfn <- function(decade_str)  { 
-    return ( filter(metric_by_loc, decade == decade_str) %>% select(lon, lat, !!as.symbol(metric_column_name)) %>% terra::rast(type="xyz", crs=crs))
+    return ( dplyr::filter(metric_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, !!as.symbol(metric_column_name)) %>% terra::rast(type="xyz", crs=crs))
   }
   
   # apply function to get a list 
@@ -180,7 +180,7 @@ metrics_by_decade_raster <- function(mhwdb_conn, mhw_table, mhw_metric = 'int_me
 duration_by_decades <- function(mhwdb_conn,mhw_table){
   duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
-    return (data.frame(filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, mhw_dur) ))
+    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
   }
   d_list <- lapply(decades, filterfn)
   
