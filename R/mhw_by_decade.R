@@ -47,25 +47,40 @@ duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
 avg_duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
   
   if(use_end_date){
-    sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+    sql_template <- "SELECT lat, lon, decades.decade, avg(mhw_dur) as avg_dur 
       FROM {mhw_table} , decades 
       WHERE ((decades.decade_start <= mhw_end_date ) AND (mhw_end_date <= decades.decade_end)) 
-      GROUP BY lat, lon, decade"
+      GROUP BY lat, lon, decades.decade"
     
   } else {
-    sql_template <- "SELECT lat, lon, decade, avg(mhw_dur) as avg_dur 
+    sql_template <- "SELECT lat, lon, decades.decade, avg(mhw_dur) as avg_dur 
       FROM {mhw_table}, decades 
     WHERE ((mhw_onset_date >= decades.decade_start) AND (mhw_onset_date <= decades.decade_end)) 
-    GROUP BY lat, lon, decade"
+    GROUP BY lat, lon, decades.decade"
   }
   
   sql <- glue::glue(sql_template)
   return(sql)
 }
 
-avg_duration_by_decade_truncated <- function(mhw_table) {
-  warning("function not implemented yet")
-  return(NA)
+#' create SQL tocalculate average duration of marine heatwaves by point in space, grouped by decade
+#' 
+#' craft the sql code to calculate averge MHW duration, using the data tables with models truncated by decade
+#' this will run on any table but you should restrict to those tables needed for analysis.   Tables are required
+#' to have column lat, lon, mhw_onset (integer formatted dates like 20411231), mhw_dur
+#' this function does not check that the table has those columns, it only generates a string of SQL
+#' 
+#' @param mhw_table character name of the table to analyze
+#' @param start_year integer year to start, inclusive (dates will include this start year)
+#' @param end_year integer year to end, inclusive (dates will include up to 12/31 of the end year)
+#' @returns character SQL code to run on the MHW database
+#' @export
+avg_duration_by_decade_truncated_sql <- function(mhw_table, start_year=2040, end_year=2069) {
+  sql_template <- "SELECT lat, lon, (mhw_onset- mod(mhw_onset,100000))/10000 as decade,avg(mhw_dur) as avg_dur
+  FROM {mhw_table} WHERE mhw_onset/10000 >= {start_year} and mhw_onset/10000 <= {end_year}+1
+  GROUP BY lat, lon, decade ORDER by decade, lat, lon"
+  sql <- glue::glue(sql_template)
+  return(sql)
 }
 
 #' rasters of global heatwave duration per decade
@@ -73,19 +88,26 @@ avg_duration_by_decade_truncated <- function(mhw_table) {
 #' a raster with layers by decade 
 #' @param mhwdb_conn database connection
 #' @param mhw_table character string name of the table to query, required (e.g. arise10_metrics)
+#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326. 
 #' @returns terra raster stack of layers for each decade
 #' @export
-durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060')){
+durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060'), crs='EPSG:4087'){
 
-  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
+  # sql = avg_duration_by_decade_sql(mhw_table)
+  sql = avg_duration_by_decade_truncated_sql(mhw_table)
+  # calculate the average duration by coordinate (see sql function above for specifics)
+  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, sql)
+  
   filterfn <- function(decade_str)  { 
-    return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs='EPSG:4326'))
+    return ( filter(duration_by_loc, decade == decade_str) %>% select(lon, lat, avg_dur) %>% terra::rast(type="xyz", crs=crs))
    }
 
   # apply function to get a list 
   d_list <- sapply(decades, filterfn)
-  # stack the rasters into layers
-  return(rast(d_list))
+  # stack the rasters into layers, climate data is 0 to 360, use rotate to make -180 to 180
+  raster_list <-terra::rast(d_list)
+  rotated_raster_list <- terra::rotate(raster_list)
+  return(rotated_raster_list)
 }
 
 
