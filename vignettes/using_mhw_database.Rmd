@@ -19,6 +19,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(magrittr)
 library(mhwci)
+
 ```
 
 This shows some basic commands to connect to the MHW-CI database, summarize data and plot. 
@@ -137,7 +138,29 @@ plot_rasters_squish_outliers(raster_list,
                              title = paste(mhw_table, mhw_metric, sql_function), 
                              scale_label = "avg intensity average, c" )
 ```
- 
+
+
+## Filtering ensembles
+
+If you use a special syntax, you can select which ensembles to use in the summaries.  The format is a string with list of ensembles and leading zeros, like this `"006,007,008"`  Ten has a leading zero to, or `"010"`  This is not a vector but a string!  (for now).  See the code below
+
+```{r, echo = TRUE}
+
+ensemble_list_string = "006,007,008"
+
+#create the rasters for each decade for this metric, similar to duration but tis is a generic function
+raster_list <- metrics_by_decade_raster(db, mhw_table, mhw_metric = mhw_metric, sql_function = sql_function, 
+                                        ensemble_list_string = ensemble_list_string )
+
+# plot, constructing the title from the variables we set above
+# no threshold is set
+plot_rasters_squish_outliers(raster_list, 
+                             title = paste(mhw_table, mhw_metric, sql_function, " ensembles ", ensemble_list_string), 
+                             scale_label = "avg intensity average, c")
+                             
+```
+
+
 ## Using SQL directly 
 
 You can run SQL command to get data using the duckdb database engine, which is very fast.  
