@@ -7,7 +7,7 @@
 plot_rasters_squish_outliers(
   raster_list,
   title = "",
-  mhw_metric = "MHW Duration, d",
+  scale_label = "",
   cut_percent = 0,
   threshold_value = NA
 )
@@ -16,6 +16,8 @@ plot_rasters_squish_outliers(
 \item{raster_list}{terra spat raster list (or stack?)}
 
 \item{title}{character title of the plot, default is empty title}
+
+\item{scale_label}{character, label to print above the legend/scale}
 
 \item{cut_percent}{numeric percentile cut-off, see percentile_cutoff_value function for descriptoin, but 1 
 will cut top 1 percent, 0.25 will cut to 0.25% off and display as top color (e.g. red)}
