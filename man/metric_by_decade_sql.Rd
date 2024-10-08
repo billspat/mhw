@@ -9,7 +9,8 @@ metric_by_decade_sql(
   mhw_metric = "int_mean",
   sql_function = "avg",
   start_year = 2040,
-  end_year = 2069
+  end_year = 2069,
+  ensemble_list_string = NA
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ metric_by_decade_sql(
 \item{start_year}{integer year to start, inclusive (dates will include this start year)}
 
 \item{end_year}{integer year to end, inclusive (dates will include up to 12/31 of the end year)}
+
+\item{ensemble_list_string}{character string that is a list of ensembles to include in format "006,007,008" 
+ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros}
 
 \item{sqlfun}{character aggregate function for duckdb, see https://duckdb.org/docs/sql/functions/aggregates}
 }

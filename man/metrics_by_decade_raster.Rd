@@ -10,6 +10,7 @@ metrics_by_decade_raster(
   mhw_metric = "int_mean",
   sql_function = "avg",
   decades = c("2040", "2050", "2060"),
+  ensemble_list_string = NA,
   crs = "EPSG:4087"
 )
 }
@@ -17,6 +18,9 @@ metrics_by_decade_raster(
 \item{mhwdb_conn}{database connection}
 
 \item{mhw_table}{character string name of the table to query, required (e.g. arise10_metrics)}
+
+\item{ensemble_list_string}{character string that is a list of ensembles to include in format "006,007,008" 
+ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros}
 
 \item{crs}{character coordinate reference system, EPSG:4087, alternatives are EPSG:4326.}
 }

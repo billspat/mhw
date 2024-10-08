@@ -8,6 +8,7 @@ generate_duration_plots(
   mhw_tables,
   conn,
   threshold = 365/2,
+  ensemble_list_string = NA,
   pdf_file_name = NULL
 )
 }

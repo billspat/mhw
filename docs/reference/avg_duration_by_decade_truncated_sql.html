@@ -54,7 +54,8 @@ this function does not check that the table has those columns, it only generates
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">avg_duration_by_decade_truncated_sql</span><span class="op">(</span></span>
 <span>  <span class="va">mhw_table</span>,</span>
 <span>  start_year <span class="op">=</span> <span class="fl">2040</span>,</span>
-<span>  end_year <span class="op">=</span> <span class="fl">2069</span></span>
+<span>  end_year <span class="op">=</span> <span class="fl">2069</span>,</span>
+<span>  ensemble_list_string <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -72,6 +73,11 @@ this function does not check that the table has those columns, it only generates
 
 <dt id="arg-end-year">end_year<a class="anchor" aria-label="anchor" href="#arg-end-year"></a></dt>
 <dd><p>integer year to end, inclusive (dates will include up to 12/31 of the end year)</p></dd>
+
+
+<dt id="arg-ensemble-list-string">ensemble_list_string<a class="anchor" aria-label="anchor" href="#arg-ensemble-list-string"></a></dt>
+<dd><p>character string that is a list of ensembles to include in format "006,007,008"
+ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -93,7 +93,7 @@ function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">db</span><span class="op">&lt;-</span> <span class="fu">mhwci</span><span class="fu">::</span><span class="fu"><a href="../reference/mhw_connect.html">mhw_connect</a></span><span class="op">(</span><span class="va">db_file</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;duckdb_connection e7440 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;duckdb_connection 46710 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
 <p>This isn’t actually the database, just a connection to it required
 for all database functions.</p>
 <p>Now you could list the tables in the database:</p>
@@ -219,12 +219,35 @@ statistics (mean, median, min, max, mode, etc)</p>
 <p><img src="using_mhw_database_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 </div>
 <div class="section level2">
+<h2 id="filtering-ensembles">Filtering ensembles<a class="anchor" aria-label="anchor" href="#filtering-ensembles"></a>
+</h2>
+<p>If you use a special syntax, you can select which ensembles to use in
+the summaries. The format is a string with list of ensembles and leading
+zeros, like this <code>"006,007,008"</code> Ten has a leading zero to,
+or <code>"010"</code> This is not a vector but a string! (for now). See
+the code below</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">ensemble_list_string</span> <span class="op">=</span> <span class="st">"006,007,008"</span></span>
+<span></span>
+<span><span class="co">#create the rasters for each decade for this metric, similar to duration but tis is a generic function</span></span>
+<span><span class="va">raster_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/metrics_by_decade_raster.html">metrics_by_decade_raster</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">mhw_table</span>, mhw_metric <span class="op">=</span> <span class="va">mhw_metric</span>, sql_function <span class="op">=</span> <span class="va">sql_function</span>, </span>
+<span>                                        ensemble_list_string <span class="op">=</span> <span class="va">ensemble_list_string</span> <span class="op">)</span></span>
+<span></span>
+<span><span class="co"># plot, constructing the title from the variables we set above</span></span>
+<span><span class="co"># no threshold is set</span></span>
+<span><span class="fu"><a href="../reference/plot_rasters_squish_outliers.html">plot_rasters_squish_outliers</a></span><span class="op">(</span><span class="va">raster_list</span>, </span>
+<span>                             title <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">mhw_table</span>, <span class="va">mhw_metric</span>, <span class="va">sql_function</span>, <span class="st">" ensembles "</span>, <span class="va">ensemble_list_string</span><span class="op">)</span>, </span>
+<span>                             scale_label <span class="op">=</span> <span class="st">"avg intensity average, c"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="using_mhw_database_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+</div>
+<div class="section level2">
 <h2 id="using-sql-directly">Using SQL directly<a class="anchor" aria-label="anchor" href="#using-sql-directly"></a>
 </h2>
 <p>You can run SQL command to get data using the duckdb database engine,
 which is very fast.</p>
 <p>This SQL averages duration for the specific table</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># this is a function that creates a string of SQL with the table we want to use</span></span>
 <span><span class="va">sql</span><span class="op">&lt;-</span> <span class="fu"><a href="../reference/avg_duration_by_decade_sql.html">avg_duration_by_decade_sql</a></span><span class="op">(</span><span class="va">mhw_table</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">sql</span><span class="op">)</span></span>
@@ -233,21 +256,21 @@ which is very fast.</p>
 <span><span class="co">#&gt; WHERE ((mhw_onset_date &gt;= decades.decade_start) AND (mhw_onset_date &lt;= decades.decade_end)) </span></span>
 <span><span class="co">#&gt; GROUP BY lat, lon, decades.decade</span></span></code></pre></div>
 <p>Here is how you run a query:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># run this SQL using the `dbGetQuery` command.  </span></span>
 <span><span class="va">duration_by_loc</span><span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">sql</span><span class="op">)</span></span>
 <span><span class="co"># show the first few rows</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">duration_by_loc</span><span class="op">)</span></span>
 <span><span class="co">#&gt;          lat   lon decade  avg_dur</span></span>
-<span><span class="co">#&gt; 1 -52.303665 88.75   2050 31.89781</span></span>
-<span><span class="co">#&gt; 2   6.125655 88.75   2050 28.36538</span></span>
-<span><span class="co">#&gt; 3   8.010472 88.75   2050 26.32727</span></span>
-<span><span class="co">#&gt; 4  20.261780 88.75   2050 22.63855</span></span>
-<span><span class="co">#&gt; 5  76.806283 88.75   2050 65.89809</span></span>
-<span><span class="co">#&gt; 6  85.287959 88.75   2050 26.84663</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 -42.879581 68.75   2060 21.87387</span></span>
+<span><span class="co">#&gt; 2 -26.858639 68.75   2060 30.79167</span></span>
+<span><span class="co">#&gt; 3 -22.146597 68.75   2060 32.38220</span></span>
+<span><span class="co">#&gt; 4  -8.952879 68.75   2060 26.31000</span></span>
+<span><span class="co">#&gt; 5  -2.356021 68.75   2060 21.78571</span></span>
+<span><span class="co">#&gt; 6   6.125655 68.75   2060 29.43498</span></span></code></pre></div>
 <p>Now close the connection used here, otherwise there may be errors
 (“could not set lock on file …”)</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

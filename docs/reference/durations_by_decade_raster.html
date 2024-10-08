@@ -46,7 +46,8 @@
 <span>  <span class="va">mhwdb_conn</span>,</span>
 <span>  <span class="va">mhw_table</span>,</span>
 <span>  decades <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2040"</span>, <span class="st">"2050"</span>, <span class="st">"2060"</span><span class="op">)</span>,</span>
-<span>  crs <span class="op">=</span> <span class="st">"EPSG:4087"</span></span>
+<span>  crs <span class="op">=</span> <span class="st">"EPSG:4087"</span>,</span>
+<span>  ensemble_list_string <span class="op">=</span> <span class="cn">NA</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -64,6 +65,11 @@
 
 <dt id="arg-crs">crs<a class="anchor" aria-label="anchor" href="#arg-crs"></a></dt>
 <dd><p>character coordinate reference system, EPSG:4087, alternatives are EPSG:4326.</p></dd>
+
+
+<dt id="arg-ensemble-list-string">ensemble_list_string<a class="anchor" aria-label="anchor" href="#arg-ensemble-list-string"></a></dt>
+<dd><p>character string that is a list of ensembles to include in format "006,007,008"
+ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -8,7 +8,8 @@ durations_by_decade_raster(
   mhwdb_conn,
   mhw_table,
   decades = c("2040", "2050", "2060"),
-  crs = "EPSG:4087"
+  crs = "EPSG:4087",
+  ensemble_list_string = NA
 )
 }
 \arguments{
@@ -17,6 +18,9 @@ durations_by_decade_raster(
 \item{mhw_table}{character string name of the table to query, required (e.g. arise10_metrics)}
 
 \item{crs}{character coordinate reference system, EPSG:4087, alternatives are EPSG:4326.}
+
+\item{ensemble_list_string}{character string that is a list of ensembles to include in format "006,007,008" 
+ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros}
 }
 \value{
 terra raster stack of layers for each decade
