@@ -45,12 +45,17 @@ percentile_cutoff_value<- function(x, cut_percent = 1){
 #' in order to handle extreme outliers.  Currently this does _not_ print the max range (outliers) in the legend
 #' @param raster_list terra spat raster list (or stack?)
 #' @param title character title of the plot, default is empty title
+#' @param scale_label character, label to print above the legend/scale
 #' @param cut_percent numeric percentile cut-off, see percentile_cutoff_value function for descriptoin, but 1 
 #' will cut top 1 percent, 0.25 will cut to 0.25% off and display as top color (e.g. red)
 #' @param threshold_value numeric optional numeric cut off the range display.  if this is sent, then cut_percent is ignored 
 #' @returns ggplot object, one map for each item in raster_list with single legend 
 #' @export
-plot_rasters_squish_outliers <- function(raster_list, title = "", mhw_metric = "MHW Duration, d", cut_percent = 0, threshold_value = NA){
+plot_rasters_squish_outliers <- function(raster_list, 
+                                         title = "", 
+                                         scale_label = "", 
+                                         cut_percent = 0, 
+                                         threshold_value = NA){
   # where to cut off the values so that 
   if( is.na(threshold_value)){
     # if cut percent is 0, will not cut of the range
@@ -70,7 +75,7 @@ plot_rasters_squish_outliers <- function(raster_list, title = "", mhw_metric = "
   g<-ggplot2::ggplot() +
     tidyterra::geom_spatraster(data = raster_list, inherit.aes = TRUE) +
     ggplot2::labs(
-      fill = mhw_metric,
+      fill = scale_label,
       title = title,
       subtitle = subtitle
     ) +

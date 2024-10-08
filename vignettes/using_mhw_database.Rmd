@@ -87,7 +87,7 @@ Plot this list of rasters, setting the name of the metric (average duration) and
 
 ```{r, echo=TRUE}
 plot_rasters_squish_outliers(raster_list, title = mhw_table, 
-                             mhw_metric = "Mean Duration, d", 
+                             scale_label = "Average Duration, d", 
                              )
 
 ```
@@ -100,7 +100,7 @@ Combine the commands above to plot the other scenarios.  Note we change the titl
 ```{r, echo=TRUE}
 raster_list <- durations_by_decade_raster(db, mhw_table= "arise15_decade_metrics")
 plot_rasters_squish_outliers(raster_list, title = "ARISE 1.5 Average Duration", 
-                             mhw_metric = "Mean Duration, d", 
+                             scale_label = "Mean Duration, d", 
                              threshold = 365/2)
 
 
@@ -108,7 +108,7 @@ plot_rasters_squish_outliers(raster_list, title = "ARISE 1.5 Average Duration",
 ```{r, echo=TRUE}
 raster_list <- durations_by_decade_raster(db, mhw_table= "ssp245_decade_metrics")
 plot_rasters_squish_outliers(raster_list, title = "SSP2 4.5 Average Duration", 
-                             mhw_metric = "Mean Duration, d", 
+                             scale_label = "Mean Duration, d", 
                              threshold = 365/2)
 
 
@@ -135,7 +135,7 @@ raster_list <- metrics_by_decade_raster(db, mhw_table, mhw_metric = mhw_metric, 
 # no threshold is set
 plot_rasters_squish_outliers(raster_list, 
                              title = paste(mhw_table, mhw_metric, sql_function), 
-                             mhw_metric = "avg intensity average, c" )
+                             scale_label = "avg intensity average, c" )
 ```
  
 ## Using SQL directly 
@@ -160,3 +160,9 @@ duration_by_loc<- DBI::dbGetQuery(db, sql)
 head(duration_by_loc)
 ```
 
+Now close the connection used here, otherwise there may be errors ("could not set lock on file ...")
+
+
+```{r, echo=TRUE}
+DBI::dbDisconnect(db)
+```
