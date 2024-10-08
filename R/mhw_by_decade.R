@@ -73,12 +73,31 @@ avg_duration_by_decade_sql <- function(mhw_table, use_end_date = FALSE) {
 #' @param mhw_table character name of the table to analyze
 #' @param start_year integer year to start, inclusive (dates will include this start year)
 #' @param end_year integer year to end, inclusive (dates will include up to 12/31 of the end year)
+#' @param ensemble_list_string character string that is a list of ensembles to include in format "006,007,008" 
+#'     ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros
 #' @returns character SQL code to run on the MHW database
 #' @export
-avg_duration_by_decade_truncated_sql <- function(mhw_table, start_year=2040, end_year=2069) {
-  sql_template <- "SELECT lat, lon, (mhw_onset- mod(mhw_onset,100000))/10000 as decade,avg(mhw_dur) as avg_dur
-  FROM {mhw_table} WHERE mhw_onset/10000 >= {start_year} and mhw_onset/10000 <= {end_year}+1
-  GROUP BY lat, lon, decade ORDER by decade, lat, lon"
+avg_duration_by_decade_truncated_sql <- function(mhw_table, 
+                                                 start_year=2040, 
+                                                 end_year=2069, 
+                                                 ensemble_list_string = NA) {
+  
+  # if the ensemble list was sent, create the fragment of SQL that will filter on that list
+  #
+  if (!is.na(ensemble_list_string)) {
+    ensemble_filter <- paste0(" and contains('", ensemble_list_string, "', ensemble) ")
+  } else {
+    ensemble_filter <- ""
+  }
+  
+  sql_template <- 
+  "SELECT lat, lon, 
+    (mhw_onset- mod(mhw_onset,100000))/10000 as decade,
+    avg(mhw_dur) as avg_dur
+  FROM {mhw_table} 
+  WHERE mhw_onset/10000 >= {start_year} and mhw_onset/10000 <= {end_year}+1 {ensemble_filter}
+  GROUP BY lat, lon, decade 
+  ORDER by decade, lat, lon"
   sql <- glue::glue(sql_template)
   return(sql)
 }
@@ -92,15 +111,32 @@ avg_duration_by_decade_truncated_sql <- function(mhw_table, start_year=2040, end
 #' @param sqlfun character aggregate function for duckdb, see https://duckdb.org/docs/sql/functions/aggregates
 #' @param start_year integer year to start, inclusive (dates will include this start year)
 #' @param end_year integer year to end, inclusive (dates will include up to 12/31 of the end year)
+#' @param ensemble_list_string character string that is a list of ensembles to include in format "006,007,008" 
+#'     ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros
 #' @returns character SQL code to run on the MHW database
 #' @export
-metric_by_decade_sql <- function(mhw_table, mhw_metric = 'int_mean', sql_function = 'avg', start_year=2040, end_year=2069) {
+metric_by_decade_sql <- function(mhw_table, mhw_metric = 'int_mean', sql_function = 'avg', 
+                                 start_year=2040, 
+                                 end_year=2069,
+                                 ensemble_list_string = NA) {
   
-  sql_template <- "SELECT lat, lon, (mhw_onset - mod(mhw_onset,100000))/10000 as decade,
+  # if the ensemble list was sent, create the fragment of SQL that will filter on that list
+  #
+  if (!is.na(ensemble_list_string)) {
+    ensemble_filter <- paste0(" and contains('", ensemble_list_string, "', ensemble) ")
+  } else {
+    ensemble_filter <- ""
+  }
+  
+  
+  sql_template <- "SELECT 
+  lat, lon, 
+  (mhw_onset - mod(mhw_onset,100000))/10000 as decade,
   {sql_function}({mhw_metric}) as {sql_function}_{mhw_metric}, 
   FROM {mhw_table} 
-  WHERE (mhw_onset/10000) >= {start_year} and ((mhw_onset - mod(mhw_onset,10000))/10000) <= {end_year}
-  GROUP BY lat, lon, decade ORDER by decade, lat, lon"
+  WHERE (mhw_onset/10000) >= {start_year} and ((mhw_onset - mod(mhw_onset,10000))/10000) <= {end_year} {ensemble_filter}
+  GROUP BY lat, lon, decade
+  ORDER by decade, lat, lon"
   
   sql <- glue::glue(sql_template)
   
@@ -113,13 +149,21 @@ metric_by_decade_sql <- function(mhw_table, mhw_metric = 'int_mean', sql_functio
 #' a raster with layers by decade 
 #' @param mhwdb_conn database connection
 #' @param mhw_table character string name of the table to query, required (e.g. arise10_metrics)
-#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326. 
+#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326.
+#' @param ensemble_list_string character string that is a list of ensembles to include in format "006,007,008" 
+#'     ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros 
 #' @returns terra raster stack of layers for each decade
 #' @export
-durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060'), crs='EPSG:4087'){
+durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040', '2050','2060'), 
+                                       crs='EPSG:4087',
+                                       ensemble_list_string = NA){
   
   # sql = avg_duration_by_decade_sql(mhw_table)
-  sql = avg_duration_by_decade_truncated_sql(mhw_table)
+  sql = avg_duration_by_decade_truncated_sql(mhw_table, 
+                                             start_year = as.numeric(decades[1]), 
+                                             end_year = as.numeric(decades[length(decades)])+9,
+                                             ensemble_list_string = ensemble_list_string)
+  
   # calculate the average duration by coordinate (see sql function above for specifics)
   duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, sql)
   
@@ -141,17 +185,26 @@ durations_by_decade_raster <- function(mhwdb_conn, mhw_table, decades = c('2040'
 #' a raster with layers by decade 
 #' @param mhwdb_conn database connection
 #' @param mhw_table character string name of the table to query, required (e.g. arise10_metrics)
-#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326. 
+#' @param crs character coordinate reference system, EPSG:4087, alternatives are EPSG:4326.
+#' @param ensemble_list_string character string that is a list of ensembles to include in format "006,007,008" 
+#'     ensembles have leaving zeros, are 3 digits and this must be a separated list with leading zeros
 #' @returns terra raster stack of layers for each decade
 #' @export
-metrics_by_decade_raster <- function(mhwdb_conn, mhw_table, mhw_metric = 'int_mean', sql_function = 'avg', decades = c('2040', '2050','2060'), crs='EPSG:4087'){
+metrics_by_decade_raster <- function(mhwdb_conn, 
+                                     mhw_table, 
+                                     mhw_metric = 'int_mean', 
+                                     sql_function = 'avg', 
+                                     decades = c('2040', '2050','2060'), 
+                                     ensemble_list_string = NA,
+                                     crs='EPSG:4087'){
   
   # create sql to calculate the metric by coordinate (see sql function above for specifics)
   sql <- metric_by_decade_sql(mhw_table, 
                               mhw_metric, 
                               sql_function, 
                               start_year = as.numeric(decades[1]), 
-                              end_year = as.numeric(decades[length(decades)])+9
+                              end_year = as.numeric(decades[length(decades)])+9,
+                              ensemble_list_string = ensemble_list_string
   )
   
   # this is copied from the metric_by_decade_sql and must be changed if that function is changed

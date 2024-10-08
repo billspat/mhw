@@ -20,14 +20,14 @@
 #' }
 
 #' @export
-generate_duration_plots<- function(mhw_tables, conn, threshold = 365/2, pdf_file_name = NULL) {
+generate_duration_plots<- function(mhw_tables, conn, threshold = 365/2, ensemble_list_string = NA, pdf_file_name = NULL) {
 
   if(! is.null(pdf_file_name)) {
     pdf(pdf_file_name)
   }
   
   for(mhw_table_name in mhw_tables){
-      raster_list <- durations_by_decade_raster(conn, mhw_table_name)
+      raster_list <- durations_by_decade_raster(conn, mhw_table_name, ensemble_list_string = ensemble_list_string)
       duration_title <- paste("Mean MHW Duration (days) by Decade of Onset, ", mhw_table_name)
       print(plot_rasters_squish_outliers(raster_list = raster_list, title = duration_title, threshold = threshold ))
       
