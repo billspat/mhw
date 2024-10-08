@@ -80,14 +80,15 @@ This function queries this table for average durations by point and decade into 
 
 ```{r, echo=TRUE}
 raster_list <- durations_by_decade_raster(db, mhw_table)
+print(raster_list)
 ```
 
 Plot this list of rasters, setting the name of the metric (average duration) and the threshold of 1/2 year
 
 ```{r, echo=TRUE}
-plot_rasters_squish_outliers(raster_list, title = "ARISE 1.0 Average Duration", 
+plot_rasters_squish_outliers(raster_list, title = mhw_table, 
                              mhw_metric = "Mean Duration, d", 
-                             threshold = 365/2)
+                             )
 
 ```
 
