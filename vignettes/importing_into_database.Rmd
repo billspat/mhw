@@ -1,0 +1,127 @@
+---
+title: "Working with the MHW-CI database"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Working with the MHW-CI database}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mhwci)
+require(magrittr)
+```
+
+## About the database
+
+This project stores data into a single, local, SQL  database which uses the [duckdb](https://duckdb.org) platform.  This platform is easy to install (`install.packages('duckdb')`) can work with a local file (no server required).  This project imports tables created for each scenario, and the tables include all the ensemble members with a column "ensemble" indicating which one. 
+
+It imports from CSV files created by Dr. Lala Kounta using Matlab. 
+
+see vignette("using_mhw_database") for reading, summarizing and plotting data. 
+
+## Export to CSV
+
+Currently, scenario/ensemble files are in Matlab data format (HDF5) and we've found that it's best to use Matlab to export those.  
+
+Essentially the files need to be opened in matlab , selecting the data element to save, and then using  `writetable()`
+
+given a matlab file path in the variable `f' with data element (matrix) MHW with the MHW metrics in it, just do
+```matlab
+% load MHW matrix
+mhwdata = load(f,'MHW');
+% construct a new file name for the CSV export 
+mhwfile = strcat(f, '.mhw.csv'); 
+% export to CSV
+writetable(mhwdata.MHW, mhwfile);
+```
+
+See the file `matlab/mhw_export_text.m` for a short script that will read all files in a directory (ensemble outputs) and use parallel pool to write these to a CSV files.
+
+## Creating SQL code for import
+
+duckdb makes it very easy to read from various formats using the `Select * from <filepath>` syntax   To import multiple CSVs into a table, I use the strategy that uses the  'union' to combine multiple select statements.   See the file [`db/build_mhw_db.sql`](db/build_mhw_db.sql) for an example of how to do this.    These SQL statements assume that the CSV files are created and you have a file path to them. 
+
+Example: 
+
+```sql
+create table arise10_metrics as 
+    SELECT *, '001' AS ensemble, 'ARISE-1.0' AS scenario FROM 'ARISE-1.0/MHW_metrics_Model_001.mat.mhw.csv'
+    UNION
+    SELECT *, '002' AS ensemble, 'ARISE-1.0' AS scenario FROM 'ARISE-1.0/MHW_metrics_Model_002.mat.mhw.csv';
+```
+
+the actual example import ensembles '001' to '010'.   
+
+When running a select statement, you can create new columns with constant values by just using the syntax  <constant> as <column name>  which creates a new column with the same value in every row.  This is a useful for creating a colum with `ensemble` number since there is no such column in the source data but we want to know that.   Since the scenarios are all in different tables it may not be essential that we also create a `scenario` column but it's good to be pro-active since we may want to combine metrics across scenarios for comparison in the database if it takes too long or too much memory to do it in R. 
+
+You can create a new table by copying this syntax, changing the table name and the file paths.    In SQL there is no concept of loops or other conditionals, while you could generate this code using a programming language like R it's just easier to copy/paste
+
+## lat/long
+
+The originl matlab matrices use an index number for x and y and those must be converted to lat/lon.   See the `build_mhw_db.sql` for how a table with the lat/lon and the indexes are created from exports, and how they can be used to add new columns into a table you've created using the syntax above.  
+
+```sql
+alter table arise10_metrics add column lat DOUBLE;
+update arise10_metrics set lat = lat_index.lat from lat_index where arise10_metrics.yloc = lat_index.yloc ;
+```
+
+the `update` command uses the `where` clause to link the `yloc` value in the original table with a `yloc` value in the `lat_index` table and then links that to a latititude value `lat`
+
+repeat for `lon`
+
+## Index
+
+Creating indexes is optional and only necessary if you find using SQL on these tables takes a long time. 
+
+## running SQL code
+
+Once you create a SQL file or a list of SQL commands, you need to run them against a database.   For duckdb, a database is just another file (with any name) so you have to tell duckdb which db file to open.  
+
+You can run them against any of the database versions you have, but that database needs to already have the `lat_index` and `lon_index` tables to convert x/y indexes to lat and lon.  
+
+There are several methods to accomplish this but I use the command line.   For all of these, the folder where you run the script/sql commands must be correct for the path to CSV file for the SQL statements 
+
+#### using the duckdb Command line interface
+
+1. install duckdb by downloading the zip file from https://duckdb.org (for your laptop, for for linux on the HPC) into your home directory and unzipping
+2. know the path of where the duckdb file is located (or optionally add that location to your $PATH)
+3. know the path to your database.   For me that path is `db/mhw_ci.db`  but it could be anywhere
+4. change to the folder where the CSV files are
+5. open the database with the duckdb command: `path/to/duckdb path/to/mhw_ci.db`   
+6. inside the duckdb command line interface, type the sql command (or copy/paste) to run:  `sql * from x_lat` for example
+
+
+#### running a sql script using the duckdb program 
+
+alternatives to steps 5 & 6 above is just step 5, if you are in the folder where the CSV files are
+
+5. run the sql code from the file on the database: 
+
+`path/to/duckdb path/to/database.db < path/to/my.sql`  
+
+For me that command is 
+
+`duckdb db/mhwci.db db/build_mhw_db.sql`
+
+
+#### Alternative using Rstudio
+
+If you place a special comment at the top of your SQL file, you can run the script directly in Rstudio.   It requires the `duckdb` package to be installed, and the CSV file path in the SQL to be relative to your R project folder. 
+
+See the file `db/example.sql` which has the comment 
+
+```sql
+-- !preview conn=DBI::dbConnect(duckdb::duckdb(), dbdir = 'db/mhwci_v3.db')
+```
+
+if the SQL commands return a table, it will be previewed.  If the commands create tables (those are called "data definition language" or DDL commands) then they should still run in Rstudio provide the path to the CSV files in the SQL commands is correct. 
+
+
