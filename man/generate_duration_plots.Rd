@@ -26,3 +26,11 @@ plots or path to plots
 \description{
 plot a series of MHW tables as maps and histograms
 }
+\examples{
+\dontrun{
+db_file = get_dbfile()
+db <- mhw_connect(db_file)
+mhw_tables <- c('arise10_decade_metrics','arise15_decade_metrics','ssp245_decade_metrics' )
+generate_duration_plots(mhw_tables, conn= db, threshold = 150, pdf_file_name = 'duration_plots.pdf')
+}
+}

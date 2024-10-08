@@ -33,7 +33,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/using_mhw_database.html">Using the MHW-CI database to plot</a></li>
+<li><a class="dropdown-item" href="../articles/importing_into_database.html">Working with the MHW-CI database</a></li>
+    <li><a class="dropdown-item" href="../articles/using_mhw_database.html">Using the MHW-CI database to plot</a></li>
   </ul>
 </li>
       </ul>
@@ -92,7 +93,7 @@ function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">db</span><span class="op">&lt;-</span> <span class="fu">mhwci</span><span class="fu">::</span><span class="fu"><a href="../reference/mhw_connect.html">mhw_connect</a></span><span class="op">(</span><span class="va">db_file</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;duckdb_connection 6aa30 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;duckdb_connection 0c910 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
 <p>This isn’t actually the database, just a connection to it required
 for all database functions.</p>
 <p>Now you could list the tables in the database:</p>
@@ -108,9 +109,10 @@ for all database functions.</p>
 <span><span class="co">#&gt;  [8] "ensembles"                               </span></span>
 <span><span class="co">#&gt;  [9] "lat_index"                               </span></span>
 <span><span class="co">#&gt; [10] "lon_index"                               </span></span>
-<span><span class="co">#&gt; [11] "ssp245_decade_metrics"                   </span></span>
-<span><span class="co">#&gt; [12] "ssp245_metrics"                          </span></span>
-<span><span class="co">#&gt; [13] "years"</span></span></code></pre></div>
+<span><span class="co">#&gt; [11] "present_period"                          </span></span>
+<span><span class="co">#&gt; [12] "ssp245_decade_metrics"                   </span></span>
+<span><span class="co">#&gt; [13] "ssp245_metrics"                          </span></span>
+<span><span class="co">#&gt; [14] "years"</span></span></code></pre></div>
 <p>The database has a table for each scenario, listed above, and a few
 other support tables. This package has a quick function to look at the
 first few rows of a table, similar to the Unix <code>head</code>
@@ -152,13 +154,23 @@ decade into data frames with x, y and value, and then uses the
 list. It also rotates the world plots so that the center is along the
 prime meridian instead of the dateline.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">raster_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/durations_by_decade_raster.html">durations_by_decade_raster</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">mhw_table</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">raster_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/durations_by_decade_raster.html">durations_by_decade_raster</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">mhw_table</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">raster_list</span><span class="op">)</span></span>
+<span><span class="co">#&gt; class       : SpatRaster </span></span>
+<span><span class="co">#&gt; dimensions  : 178, 288, 3  (nrow, ncol, nlyr)</span></span>
+<span><span class="co">#&gt; resolution  : 1.25, 0.9424084  (x, y)</span></span>
+<span><span class="co">#&gt; extent      : -180.625, 179.375, -78.2199, 89.5288  (xmin, xmax, ymin, ymax)</span></span>
+<span><span class="co">#&gt; coord. ref. : WGS 84 / World Equidistant Cylindrical (EPSG:4087) </span></span>
+<span><span class="co">#&gt; source(s)   : memory</span></span>
+<span><span class="co">#&gt; names       :     2040,     2050,    2060 </span></span>
+<span><span class="co">#&gt; min values  :   5.0000,   5.0000,    5.00 </span></span>
+<span><span class="co">#&gt; max values  : 352.6837, 760.3404, 3040.25</span></span></code></pre></div>
 <p>Plot this list of rasters, setting the name of the metric (average
 duration) and the threshold of 1/2 year</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_rasters_squish_outliers.html">plot_rasters_squish_outliers</a></span><span class="op">(</span><span class="va">raster_list</span>, title <span class="op">=</span> <span class="st">"ARISE 1.0 Average Duration"</span>, </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_rasters_squish_outliers.html">plot_rasters_squish_outliers</a></span><span class="op">(</span><span class="va">raster_list</span>, title <span class="op">=</span> <span class="va">mhw_table</span>, </span>
 <span>                             mhw_metric <span class="op">=</span> <span class="st">"Mean Duration, d"</span>, </span>
-<span>                             threshold <span class="op">=</span> <span class="fl">365</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<span>                             <span class="op">)</span></span></code></pre></div>
 <p><img src="using_mhw_database_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -226,13 +238,13 @@ which is very fast.</p>
 <span><span class="va">duration_by_loc</span><span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">sql</span><span class="op">)</span></span>
 <span><span class="co"># show the first few rows</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">duration_by_loc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;         lat  lon decade  avg_dur</span></span>
-<span><span class="co">#&gt; 1  73.03665 5.00   2060 45.15217</span></span>
-<span><span class="co">#&gt; 2  85.28796 5.00   2060 83.49615</span></span>
-<span><span class="co">#&gt; 3 -67.38220 6.25   2060 16.03158</span></span>
-<span><span class="co">#&gt; 4 -27.80105 6.25   2060 26.88514</span></span>
-<span><span class="co">#&gt; 5 -23.08901 6.25   2060 24.79832</span></span>
-<span><span class="co">#&gt; 6  38.16754 6.25   2060 31.27132</span></span></code></pre></div>
+<span><span class="co">#&gt;           lat  lon decade  avg_dur</span></span>
+<span><span class="co">#&gt; 1  70.2094246 5.00   2060 20.00000</span></span>
+<span><span class="co">#&gt; 2  86.2303671 5.00   2060 63.42525</span></span>
+<span><span class="co">#&gt; 3 -25.9162302 6.25   2060 25.79730</span></span>
+<span><span class="co">#&gt; 4 -19.3193715 6.25   2060 25.32836</span></span>
+<span><span class="co">#&gt; 5  -0.4712039 6.25   2060 27.95175</span></span>
+<span><span class="co">#&gt; 6 -53.2460732 7.50   2060 38.11203</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

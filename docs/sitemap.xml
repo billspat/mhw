@@ -1,5 +1,6 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://srm-ecology.github.io/mhwci/404.html</loc></url>
+<url><loc>https://srm-ecology.github.io/mhwci/articles/importing_into_database.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/articles/index.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/articles/using_mhw_database.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/authors.html</loc></url>
@@ -13,6 +14,7 @@
 <url><loc>https://srm-ecology.github.io/mhwci/reference/duration_by_decade_sql.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/reference/duration_by_decades.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/reference/durations_by_decade_raster.html</loc></url>
+<url><loc>https://srm-ecology.github.io/mhwci/reference/generate_duration_plots.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/reference/get_dbfile.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/reference/index.html</loc></url>
 <url><loc>https://srm-ecology.github.io/mhwci/reference/make_view.html</loc></url>
