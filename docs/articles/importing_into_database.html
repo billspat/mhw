@@ -79,7 +79,7 @@ created for each scenario, and the tables include all the ensemble
 members with a column “ensemble” indicating which one.</p>
 <p>It imports from CSV files created by Dr. Lala Kounta using
 Matlab.</p>
-<p>see “using_mhw_database” vignette for reading, summarizing and
+<p>see vignette(“using_mhw_database”) for reading, summarizing and
 plotting data.</p>
 </div>
 <div class="section level2">
@@ -204,7 +204,7 @@ run the script directly in Rstudio. It requires the <code>duckdb</code>
 package to be installed, and the CSV file path in the SQL to be relative
 to your R project folder.</p>
 <p>See the file <code>db/example.sql</code> which has the comment</p>
-<p><code>-- !preview conn=DBI::dbConnect(duckdb::duckdb(), dbdir = 'db/mhwci_v3.db')</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">-- !preview conn=DBI::dbConnect(duckdb::duckdb(), dbdir = 'db/mhwci_v3.db')</span></span></code></pre></div>
 <p>if the SQL commands return a table, it will be previewed. If the
 commands create tables (those are called “data definition language” or
 DDL commands) then they should still run in Rstudio provide the path to
