@@ -178,9 +178,9 @@ metrics_by_decade_raster <- function(mhwdb_conn, mhw_table, mhw_metric = 'int_me
 #' @returns list of dataframes, one dataframe per decade, each data frame see avg_duration_by_decade_sql for
 #' @export 
 duration_by_decades <- function(mhwdb_conn,mhw_table){
-  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_sql(mhw_table))
+  duration_by_loc<- DBI::dbGetQuery(conn=mhwdb_conn, avg_duration_by_decade_truncated_sql(mhw_table)) # avg_duration_by_decade_sql(mhw_table))
   filterfn <- function(decade_str)  { 
-    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
+    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, avg_dur) ))
   }
   d_list <- lapply(decades, filterfn)
   
@@ -196,14 +196,14 @@ duration_by_decade_histogram<-function(mhwdb_conn, mhw_table = "mhw_metrics", lo
   
   # create list object, one item per decade
   filterfn <- function(decade_str)  { 
-    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, mhw_dur) ))
+    return (data.frame(dplyr::filter(duration_by_loc, decade == decade_str) %>% dplyr::select(lon, lat, avg_dur) ))
   }
   
   d_list <- lapply(decades, filterfn)
   
-  d<- lapply(d_list, function(x) {dplyr::select(x, mhw_dur)})
+  d<- lapply(d_list, function(x) {dplyr::select(x, avg_dur)})
   d<- dplyr::bind_rows(d, .id = "id")
-  g = ggplot2::ggplot(d, ggplot2::aes(mhw_dur)) + ggplot2::geom_histogram(bins=100)+ ggplot2::facet_wrap(~id)
+  g = ggplot2::ggplot(d, ggplot2::aes(avg_dur)) + ggplot2::geom_histogram(bins=100)+ ggplot2::facet_wrap(~id)
   if(log_scale) g = g + ggplot2::scale_x_log10() + ggplot2::scale_y_log10() 
   g
 }
