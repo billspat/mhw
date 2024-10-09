@@ -93,7 +93,7 @@ function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">db</span><span class="op">&lt;-</span> <span class="fu">mhwci</span><span class="fu">::</span><span class="fu"><a href="../reference/mhw_connect.html">mhw_connect</a></span><span class="op">(</span><span class="va">db_file</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">db</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;duckdb_connection 46710 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;duckdb_connection 11300 driver=&lt;duckdb_driver dbdir='/Users/billspat/Code/SpaCELab/marine_heatwave_work/mhwci/db/mhwci_v3.db' read_only=FALSE bigint=numeric&gt;&gt;</span></span></code></pre></div>
 <p>This isn’t actually the database, just a connection to it required
 for all database functions.</p>
 <p>Now you could list the tables in the database:</p>
@@ -261,13 +261,13 @@ which is very fast.</p>
 <span><span class="va">duration_by_loc</span><span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbGetQuery.html" class="external-link">dbGetQuery</a></span><span class="op">(</span><span class="va">db</span>, <span class="va">sql</span><span class="op">)</span></span>
 <span><span class="co"># show the first few rows</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">duration_by_loc</span><span class="op">)</span></span>
-<span><span class="co">#&gt;          lat   lon decade  avg_dur</span></span>
-<span><span class="co">#&gt; 1 -42.879581 68.75   2060 21.87387</span></span>
-<span><span class="co">#&gt; 2 -26.858639 68.75   2060 30.79167</span></span>
-<span><span class="co">#&gt; 3 -22.146597 68.75   2060 32.38220</span></span>
-<span><span class="co">#&gt; 4  -8.952879 68.75   2060 26.31000</span></span>
-<span><span class="co">#&gt; 5  -2.356021 68.75   2060 21.78571</span></span>
-<span><span class="co">#&gt; 6   6.125655 68.75   2060 29.43498</span></span></code></pre></div>
+<span><span class="co">#&gt;         lat    lon decade   avg_dur</span></span>
+<span><span class="co">#&gt; 1  72.09424 268.75   2050  39.52206</span></span>
+<span><span class="co">#&gt; 2  77.74869 268.75   2050 107.49533</span></span>
+<span><span class="co">#&gt; 3 -70.20942 270.00   2050  20.23714</span></span>
+<span><span class="co">#&gt; 4 -67.38220 270.00   2050  43.00000</span></span>
+<span><span class="co">#&gt; 5 -60.78534 270.00   2050  57.35106</span></span>
+<span><span class="co">#&gt; 6 -56.07330 270.00   2050  42.69811</span></span></code></pre></div>
 <p>Now close the connection used here, otherwise there may be errors
 (“could not set lock on file …”)</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
